@@ -1,13 +1,57 @@
 import home from './home.css'
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-// import Picker from 'emoji-picker-react';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { BiSmile } from 'react-icons/bi';
+import {TiDelete} from 'react-icons/ti'
 
 
 const Home = ()=>{
+  const [img,setImg] = useState('');
+  const [clipimg,setClipimg] = useState([]);
+  const insertElement = (element) => {
+    setClipimg((prevArray) => [...prevArray, element]);
+  };
+
+
+const removeItem = (index) => {
+  const newArray = [...clipimg];
+  newArray.splice(index, 1);
+  setClipimg(newArray);
+};
+
+   const handlePaste = (event) => {
+    const items = event.clipboardData.items;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        insertElement(item);
+
+        // Handle the file as needed
+        // console.log('Pasted file:', file);
+        // Perform any additional logic with the file here
+
+        // Clear the input value (optional)
+        // event.target.value += file;
+
+        // var blob = item.getAsFile();
+        // var reader = new FileReader();
+        // reader.onload = function(event) {
+            // document.getElementById("img").src = event.target.result;
+            // document.querySelector('.files').innerHTML +=  '<li> <img class="w-25" src="'+ event.target.result +'" /> </li>';
+        // };
+ 
+        // reader.readAsDataURL(blob);
+
+        // console.log(file);
+      }
+    }
+  };
+
 
   const [socketUrl, setSocketUrl] = useState('wss://jd.self.ge:8080/chat');
   const [messageHistory, setMessageHistory] = useState([]);
@@ -27,13 +71,16 @@ const Home = ()=>{
     []
   );
 
-  // const handleClickSendMessage = useCallback(() => sendMessage('jaba'), []);
 
+  var divElement = document.querySelector('.modal-body');
 
   const SubmitMsg = (e)=>{
     e.preventDefault();
+    if(e.target[0].value == ''){
+      return false;
+    }
     sendMessage(e.target[0].value);
-    e.target[0].value = '';
+    e.target[0].value = '';    
   }
 
 
@@ -42,8 +89,7 @@ const Home = ()=>{
     const inputField = document.getElementById('msg');
       const startPos = inputField.selectionStart;
       const endPos = inputField.selectionEnd;
-
-      const sym = e.unified.split('_');
+      const sym = e.unified.split('_'); 
       const CodeArr = [];
     sym.forEach((e,i) => {
       if(e != ''){
@@ -51,27 +97,8 @@ const Home = ()=>{
       }
     });
 
-    console.log(CodeArr);
-    // let emoji = String.fromCodePoint(...CodeArr);
-
-      // inputField.value = inputField.value.substring(0, startPos) + emoji + inputField.value.substring(endPos, inputField.value.length);
-
-      // Move the cursor after the inserted emoji
-      // const newPos = startPos + emoji.length;
-      // inputField.setSelectionRange(newPos, newPos);
-      // inputField.focus();
-
-
-
-    // const sym = e.unified.split('_');
-    // const CodeArr = [];
-    // sym.forEach((e,i) => {
-    //   CodeArr[i] = '0x' + e;
-    // });
-    // let emoji = String.fromCodePoint(...CodeArr);
-    // let msg = document.getElementById('msg');
-    // msg.value += emoji;
-    // console.log(emoji);
+    let emoji = String.fromCodePoint(...CodeArr);
+      inputField.value = inputField.value.substring(0, startPos) + emoji + inputField.value.substring(endPos, inputField.value.length);
   }
 
   const connectionStatus = {
@@ -82,36 +109,6 @@ const Home = ()=>{
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
 
-
-
-  // messageHistory.map((e)=>{
-  //   // let msg = (JSON.parse(e.data));
-  //   let data = e.data;
-  //   const jsonObject = JSON.parse(data);
-  //   console.log(jsonObject['message']);
-  // })
-
-
-  // return(
-  //   <div>
-  //     <button onClick={handleClickChangeSocketUrl}>
-  //       Click Me to change Socket Url
-  //     </button>
-  //     <button
-  //       onClick={handleClickSendMessage}
-  //       disabled={readyState !== ReadyState.OPEN}
-  //     >
-  //       Click Me to send 'Hello'
-  //     </button>
-  //     <span>The WebSocket is currently {connectionStatus}</span>
-  //     {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
-  //     <ul>
-  //       {messageHistory.map((message, idx) => (
-  //         <span key={idx}>{message ? message.data : null}</span>
-  //       ))}
-  //     </ul>
-  //   </div>
-  // )
 
 
   const Users = [
@@ -144,28 +141,28 @@ const Home = ()=>{
 
 
 
-  const massages = [
-    {
-      type : 'sender',
-      msg : 'hello world',
-      time : '10:16 am'
-    },
-    {
-      type : 'repaly',
-      msg : 'hi',
-      time : '10:16 am'
-    },
-    {
-      type : 'sender',
-      msg : 'hello world',
-      time : '10:16 am'
-    },
-    {
-      type : 'sender',
-      msg : 'hello world',
-      time : '10:16 am'
-    }
-  ];
+  // const massages = [
+  //   {
+  //     type : 'sender',
+  //     msg : 'hello world',
+  //     time : '10:16 am'
+  //   },
+  //   {
+  //     type : 'repaly',
+  //     msg : 'hi',
+  //     time : '10:16 am'
+  //   },
+  //   {
+  //     type : 'sender',
+  //     msg : 'hello world',
+  //     time : '10:16 am'
+  //   },
+  //   {
+  //     type : 'sender',
+  //     msg : 'hello world',
+  //     time : '10:16 am'
+  //   }
+  // ];
 
 
     return(
@@ -290,9 +287,6 @@ const Home = ()=>{
                           // let msg = (JSON.parse(e.data));
                           let data = e.data;
                           const jsonObject = JSON.parse(data);
-                          // console.log(jsonObject['message']);
-                          console.log(e, 'esaa');
-
                           return(
                             <>
                             <li key={i} className={'sender'}>
@@ -324,9 +318,10 @@ const Home = ()=>{
                     }}> */}
 
 
-                  <form action="" onSubmit={SubmitMsg}>
-                    <input type="text" id="msg" className="form-control" aria-label="message…" placeholder="Write message…" />
-                    <button type="button"><i className="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+                  <form action="" encType="multipart/form-data"  onSubmit={SubmitMsg}>
+                  {/* <p contentEditable="true"  id="msg" className="form-control" onPaste={handlePaste}></p> */}
+                    <input type="text" id="msg" className="form-control" aria-label="message…" placeholder="Write message…" onPaste={handlePaste} />
+                    <button type="submit"><i className="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
                   </form>
 
                   <div className="send-btns">
@@ -351,7 +346,6 @@ const Home = ()=>{
             {
               showEmoji ?
               <Picker data={data} onEmojiSelect={
-                // console.log
                 SelectEmoji
               } />
               : ''
@@ -364,8 +358,38 @@ const Home = ()=>{
                       </select> */}
                     </div>
                   </div>
-
                 </div>
+                  <div className="container w-100 files">
+                    <ul>
+                    {
+                      clipimg.map((item,i)=>{
+                        var src;
+                        var file;
+                        var reader = new FileReader();
+                        if (item.kind === 'file') {
+                          file = item.getAsFile();
+                          // Set the onload event handler
+                          var result;
+                        reader.onload = function(event) {
+                          // The result of readAsDataURL will be available here
+                          result = event.target.result;
+                          setImg(result)
+                        };
+                        reader.readAsDataURL(file);
+                        return (
+                                  <li key={i} className='mt-2'>
+                                      <img src={img} className='w-25' alt='err' />
+                                      <TiDelete style={{cursor:'pointer'}} onClick={()=>{removeItem(i)}} />
+                                  </li>
+                               )     
+                         }
+                         }
+                        )
+                    }
+                  </ul>
+
+</div>
+<img id='img' />
               </div>
             </div>
           </div>
