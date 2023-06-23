@@ -81,6 +81,15 @@ const removeItem = (index) => {
     }
     sendMessage(e.target[0].value);
     e.target[0].value = '';    
+    let msgbody = document.querySelector('.msg-body');
+    if(msgbody != null){
+      setTimeout(function() {
+        msgbody.scrollTo({
+          top: document.querySelector('.msg-body ul').scrollHeight,
+          behavior: "smooth"
+        });
+      }, 100);
+    }
   }
 
 
@@ -267,7 +276,7 @@ const removeItem = (index) => {
                   </div>
                 </div>
 
-                <div className="modal-body">
+                {/* <div className="modal-body"> */}
                   <div className="msg-body">
                     <ul>
                      
@@ -307,7 +316,7 @@ const removeItem = (index) => {
 
                     </ul>
                   </div>
-                </div>
+                {/* </div> */}
 
                 <div className="send-box">
                   {/* <form action="" onSubmit={(e)=>{
@@ -378,7 +387,7 @@ const removeItem = (index) => {
                         reader.readAsDataURL(file);
                         return (
                                   <li key={i} className='mt-2'>
-                                      <img src={img} className='w-25' alt='err' />
+                                      <img src={img} style={{width:'60px'}} alt='err' />
                                       <TiDelete style={{cursor:'pointer'}} onClick={()=>{removeItem(i)}} />
                                   </li>
                                )     
