@@ -61,6 +61,15 @@ const removeItem = (index) => {
   const [ showEmoji, setShowEmoji] = useState(false);
 
   useEffect(() => {
+   document.getElementById('msg').addEventListener('input', (e) => {
+    var convertedText = e.target.value
+    .replace(/<3/g, "❤️")
+    .replace(/:D/g, "😀")
+    .replace(/3:\)/g, "😈");
+
+    e.target.value = convertedText;
+   })
+
     if (lastMessage !== null) {
       setMessageHistory((prev) => prev.concat(lastMessage));
     }
@@ -94,19 +103,20 @@ const removeItem = (index) => {
 
 
   const SelectEmoji = (e)=>{
-   
+   console.log(e);
     const inputField = document.getElementById('msg');
       const startPos = inputField.selectionStart;
       const endPos = inputField.selectionEnd;
-      const sym = e.unified.split('_'); 
-      const CodeArr = [];
-    sym.forEach((e,i) => {
-      if(e != ''){
-        CodeArr[i] = '0x' + e;
-      }
-    });
+      // const sym = e.unified.split('_'); 
+      // const CodeArr = [];
+      // sym.forEach((e,i) => {
+      //   if(e != ''){
+      //     CodeArr[i] = '0x' + e;
+      //   }
+      // });
+    // console.log(...CodeArr);
 
-    let emoji = String.fromCodePoint(...CodeArr);
+    let emoji = e.native;
       inputField.value = inputField.value.substring(0, startPos) + emoji + inputField.value.substring(endPos, inputField.value.length);
   }
 
@@ -329,7 +339,7 @@ const removeItem = (index) => {
 
                   <form action="" encType="multipart/form-data"  onSubmit={SubmitMsg}>
                   {/* <p contentEditable="true"  id="msg" className="form-control" onPaste={handlePaste}></p> */}
-                    <input type="text" id="msg" className="form-control" aria-label="message…" placeholder="Write message…" onPaste={handlePaste} />
+                    <input type="text" id="msg" className="form-control" aria-label="message…" placeholder="Write message…"  onPaste={handlePaste}  />
                     <button type="submit"><i className="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
                   </form>
 
