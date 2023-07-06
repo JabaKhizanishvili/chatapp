@@ -4,16 +4,16 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { BiSmile } from 'react-icons/bi';
-import {TiDelete} from 'react-icons/ti'
+import {TiDelete} from 'react-icons/ti';
+import Chatlist from '../../Components/chatusers/ChatUsers';
 
 
-const Home = ()=>{
+const Home = ({userid})=>{
   const [img,setImg] = useState('');
   const [clipimg,setClipimg] = useState([]);
   const insertElement = (element) => {
     setClipimg((prevArray) => [...prevArray, element]);
   };
-
 
 const removeItem = (index) => {
   const newArray = [...clipimg];
@@ -103,7 +103,7 @@ const removeItem = (index) => {
 
 
   const SelectEmoji = (e)=>{
-   console.log(e);
+  //  console.log(e);
     const inputField = document.getElementById('msg');
       const startPos = inputField.selectionStart;
       const endPos = inputField.selectionEnd;
@@ -130,33 +130,7 @@ const removeItem = (index) => {
 
 
 
-  const Users = [
-    {
-      fullName : 'Jaba Khizanishvili',
-      position : 'Developer',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Zura Khizanishvili',
-      position : 'Ragaca',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Mari Khizanishvili',
-      position : 'Test',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Jaba Khizanishvili',
-      position : 'Developer',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Jaba Khizanishvili',
-      position : 'Developer',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    }
-  ];
+
 
 
 
@@ -193,76 +167,7 @@ const removeItem = (index) => {
     <div className="row">
       <div className="col-12">
         <div className="chat-area">
-          <div className="chatlist">
-            <div className="modal-dialog-scrollable">
-              <div className="modal-content">
-                <div className="chat-header">
-                  <div className="msg-search">
-                    <input type="text" className="form-control" id="inlineFormInputGroup" placeholder="Search" aria-label="search"/>
-                    <a className="add" href="#">
-                      <img className="img-fluid" src={'https://mehedihtml.com/chatbox/assets/img/add.svg'} alt="add" />
-                    </a>
-                  </div>
-
-                  <ul className="nav nav-tabs" id="myTab" role="tablist">
-                    {/* <li className="nav-item" role="presentation">
-                      <button className="nav-link active" id="Open-tab" data-bs-toggle="tab" data-bs-target="#Open" type="button" role="tab" aria-controls="Open" aria-selected="true">Open</button>
-                    </li>
-                    <li className="nav-item" role="presentation">
-                      <button className="nav-link" id="Closed-tab" data-bs-toggle="tab" data-bs-target="#Closed" type="button" role="tab" aria-controls="Closed" aria-selected="false">Closed</button>
-                    </li> */}
-                  </ul>
-                </div>
-
-                <div className="modal-body">
-                  <div className="chat-lists">
-                    <div className="tab-content" id="myTabContent">
-                      <div className="tab-pane fade show active mt-4" id="Open" role="tabpanel" aria-labelledby="Open-tab">
-                      {
-                          Users.map((e,i)=>{
-                            return(
-                              <a key={i} href="#" className="d-flex align-items-center">
-                              <div className="flex-shrink-0">
-                                <img className="img-fluid" src={e.photo} alt="user img"/>
-                              </div>
-                              <div className="flex-grow-1 ms-3">
-                                <h6>{e.fullName}</h6>
-                                <p>{e.position}</p>
-                              </div>
-                            </a>
-                            )
-                          })
-
-                        }                  
-                      </div>
-                      <div className="tab-pane fade" id="Closed" role="tabpanel" aria-labelledby="Closed-tab">
-
-                        <div className="chat-list">     
-                        {
-                          Users.map((e,i)=>{
-                            return(
-                              <a key={i} href="#" className="d-flex align-items-center">
-                              <div className="flex-shrink-0">
-                                <img className="img-fluid" src={e.photo} alt="user img"/>
-                              </div>
-                              <div className="flex-grow-1 ms-3">
-                                <h3>{e.fullName}</h3>
-                                <p>{e.position}</p>
-                              </div>
-                            </a>
-                            )
-                          })
-                        }                  
-                         
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+         <Chatlist />
 
           <div className="chatbox">
             <div className="modal-dialog-scrollable">
@@ -382,7 +287,7 @@ const removeItem = (index) => {
                     <ul>
                     {
                       clipimg.map((item,i)=>{
-                        var src;
+                        // var src;
                         var file;
                         var reader = new FileReader();
                         if (item.kind === 'file') {
@@ -408,7 +313,7 @@ const removeItem = (index) => {
                   </ul>
 
 </div>
-<img id='img' />
+{/* <img id='img' alt='err'/> */}
               </div>
             </div>
           </div>

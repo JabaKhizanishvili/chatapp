@@ -700,21 +700,22 @@ button:focus {
     margin-right: 5px;
   }
   .chatlist {
-    width: 100%;
+    /* width: 100%; */
   }
-  .chatbox {
-    width: 100%;
-    position: absolute;
-    left: 1000px;
-    right: 0;
-    background: #fff;
-    transition: all 0.5s ease;
-    border-left: none;
-  }
-  .showbox {
-    left: 0 !important;
-    transition: all 0.5s ease;
-  }
+  /* .chatbox { */
+    /* background-color: red; */
+    /* width: 100%; */
+    /* position: absolute; */
+    /* left: 1000px; */
+    /* right: 0; */
+    /* background: #fff; */
+    /* transition: all 0.5s ease; */
+    /* border-left: none; */
+  /* } */
+  /* .showbox { */
+    /* left: 0 !important; */
+    /* transition: all 0.5s ease; */
+  /* } */
   .msg-head h3 {
     font-size: 14px;
   }
