@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useFetcher } from 'react-router-dom';
 
 const animatedComponents = makeAnimated();
-const CreateConversation = ({ sendDataToParent })=>{
+const CreateConversation = ({ sendDataToParent, Group })=>{
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
@@ -30,12 +30,14 @@ var requestOptions = {
 fetch("https://jd.self.ge/api/Chat/CreateConversation", requestOptions)
   .then(response => response.text())
   .then(result =>  {
-    console.log(result);
-    sendDataToParent(false)
+    // sendDataToParent(false);
+    Group('დაემატა')
+
   })
   .catch(error => console.log('error', error));
 
 
+  sendDataToParent(false);
       };
 
 

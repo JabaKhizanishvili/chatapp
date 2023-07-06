@@ -1,35 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CreateConversation from '../createConversation/createConvesation'
 import { Modal } from "bootstrap";
- 
-const Users = [
-    {
-      fullName : 'Jaba Khizanishvili',
-      position : 'Developer',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Zura Khizanishvili',
-      position : 'Ragaca',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Mari Khizanishvili',
-      position : 'Test',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Jaba Khizanishvili',
-      position : 'Developer',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    },
-    {
-      fullName : 'Jaba Khizanishvili',
-      position : 'Developer',
-      photo : 'https://mehedihtml.com/chatbox/assets/img/user.png',
-    }
-  ];
-
+import { Get } from 'react-axios';
+import axios from 'axios';
+import { BsPersonCircle } from 'react-icons/bs'
 
 
 const Chatlist = ()=>{
@@ -39,6 +13,51 @@ const Chatlist = ()=>{
       setDataFromChild(data);
         setModal(data);
     };
+
+    const [Users, setUsers] = useState([]);
+
+    useEffect(() => {
+     
+      fetch('https://jd.self.ge/api/Chat/getConversations')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Error: ' + response.status);
+        }
+      })
+      .then(data => {
+        // Handle the response data
+        setUsers(JSON.parse(data));
+      })
+      .catch(error => {
+        // Handle any errors
+        console.error('Request failed:', error);
+      });
+  
+    }, []);
+
+    const ConvAdd = (data)=>{
+
+      fetch('https://jd.self.ge/api/Chat/getConversations')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Error: ' + response.status);
+        }
+      })
+      .then(data => {
+        // Handle the response data
+        setUsers(JSON.parse(data));
+      })
+      .catch(error => {
+        // Handle any errors
+        console.error('Request failed:', error);
+      });
+
+    }
+
     return(
         <>
           <div className="chatlist">
@@ -51,7 +70,7 @@ const Chatlist = ()=>{
                       <img className="img-fluid" src={'https://mehedihtml.com/chatbox/assets/img/add.svg'} alt="add" />
                     </a>
                     {
-                      modal && <CreateConversation sendDataToParent={handleDataFromChild}/>
+                      modal && <CreateConversation sendDataToParent={handleDataFromChild} Group={ConvAdd}/>
                     }
                   </div>
 
@@ -70,27 +89,29 @@ const Chatlist = ()=>{
                     <div className="tab-content" id="myTabContent">
                       <div className="tab-pane fade show active mt-4" id="Open" role="tabpanel" aria-labelledby="Open-tab">
                       {
-                          Users.map((e,i)=>{
+                         Users.map((e,i)=>{
                             return(
                               <a key={i} href="#" className="d-flex align-items-center">
                               <div className="flex-shrink-0">
-                                <img className="img-fluid" src={e.photo} alt="user img"/>
+                              <BsPersonCircle/>
+                                {/* <img className="img-fluid" src={e.photo} alt="user img"/> */}
                               </div>
                               <div className="flex-grow-1 ms-3">
-                                <h6>{e.fullName}</h6>
-                                <p>{e.position}</p>
+                                <h6>{e.TEXT}</h6>
+                                {/* <p>{e.position}</p> */}
                               </div>
                             </a>
                             )
                           })
 
-                        }                  
+                        }  
+                                      
                       </div>
                       <div className="tab-pane fade" id="Closed" role="tabpanel" aria-labelledby="Closed-tab">
 
                         <div className="chat-list">     
                         {
-                          Users.map((e,i)=>{
+                          [].map((e,i)=>{
                             return(
                               <a key={i} href="#" className="d-flex align-items-center">
                               <div className="flex-shrink-0">
