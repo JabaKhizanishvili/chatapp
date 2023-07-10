@@ -10,7 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 const Chatlist = ()=>{
     const [modal,setModal] = useState(false);
-    const [pagination, setPagination ] = useState({start: 0, limit: 15});
+    const [pagination, setPagination ] = useState({start: 0, limit: 12, count:false, pages: false});
 
     const [dataFromChild, setDataFromChild] = useState('');
     const handleDataFromChild = (data) => {
@@ -34,6 +34,14 @@ const Chatlist = ()=>{
         // Handle the response data
         let res = data;
         setUsers(res.data);
+        let countdata = res.count[0]['COUNT(*)'] * 1;
+        let pages = Math.ceil(countdata / pagination.limit);
+        setPagination(values => ({
+          ...values,
+          // calculate pages
+          ['count']: countdata,
+          ['pages']: pages
+      }))
       })
       .catch(error => {
         // Handle any errors
@@ -76,10 +84,9 @@ const Chatlist = ()=>{
             redirect: 'follow',
           };
           
-          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&start=0&limit=15`, requestOptions)
+          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&start=0&limit=${pagination.limit}`, requestOptions)
             .then(response => response.text())
             .then(result =>{
-              // setUsers(JSON.parse(result))
               let res = JSON.parse(result);
         setUsers(res.data);
             } )
@@ -93,7 +100,7 @@ const Chatlist = ()=>{
             redirect: 'follow',
           };
           
-          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=0&limit=15`, requestOptions)
+          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=0&limit=${pagination.limit}`, requestOptions)
             .then(response => response.text())
             .then(result =>{
               let res = JSON.parse(result);
@@ -150,16 +157,46 @@ const Chatlist = ()=>{
                       <InfiniteScroll
     dataLength={Users.length}
     next={()=>{
-      console.log('asd');
+      if(Users.length == pagination.count) return false;
+      for (let index = 0; index < pagination.pages ; index++) {
+        // const element = array[index];
+        if(index == 0){
+          continue;
+        }
+        let start = pagination.limit * index;
+        
+        fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${start + pagination.limit}`)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Error: ' + response.status);
+        }
+      })
+      .then(data => {
+        // Handle the response data
+        let res = data;
+        let newArray = [];
+        res.data.forEach((el,i) => {
+          newArray[i] = el;
+          // setUsers([...Users, el])
+        });
+        const children = Users.concat(newArray);
+        setUsers(children);
+      })
+      .catch(error => {
+        // Handle any errors
+        console.error('Request failed:', error);
+      });
+        
+      }
     }}
-//To put endMessage and loader to the top.
-    // inverse={true}
-    hasMore={true}
+    hasMore={ Users.length == pagination.count ? false : true }
     loader={<h4>Loading...</h4>}
     scrollableTarget="scrollableDiv"
   >
     {Users.map((e,i) => (
-      <a key={i} href="#" className="d-flex align-items-center mb-4">
+      <a key={i} href="#" className="d-flex align-items-center mt-4 pb-2 mb-12">
                               <div className="flex-shrink-0">
                               <BsPersonCircle/>
                                 {/* <img className="img-fluid" src={e.photo} alt="user img"/> */}
