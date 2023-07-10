@@ -4,7 +4,7 @@ export class ProtectedPage extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        window.location.href = "https://jd.self.ge";
+        window.location.href = "https://jd.self.ge/?chat=true";
       }
 
     render() {

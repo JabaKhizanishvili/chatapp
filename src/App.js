@@ -31,7 +31,11 @@ function App() {
           }
           else if(response !== null) {
             // return (<div>{response.data.message} <button onClick={() => makeRequest({ params: { refresh: true } })}>Refresh</button></div>)
-            return <Home userid={response} />
+            if(response.data.userid == false){
+              return <Home userid={response} />
+            }else{
+              return <ProtectedPage/>;
+            }
           }
           // return (<div>Default message before request is made.</div>)
         }}

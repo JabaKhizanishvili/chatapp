@@ -6,6 +6,7 @@ import axios from 'axios';
 import { BsPersonCircle } from 'react-icons/bs'
 
 
+
 const Chatlist = ()=>{
     const [modal,setModal] = useState(false);
     const [dataFromChild, setDataFromChild] = useState('');
@@ -58,6 +59,43 @@ const Chatlist = ()=>{
 
     }
 
+    const searchConversations = (e)=>{
+      var timer;
+      clearTimeout(timer);
+      if(e.target.value.length >= 3){
+        const timer = setTimeout(() => {          
+          var requestOptions = {
+            method: 'GET',
+            redirect: 'follow',
+          };
+          
+          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}`, requestOptions)
+            .then(response => response.text())
+            .then(result =>{
+              setUsers(JSON.parse(result))
+            } )
+            .catch(error => console.log('error', error));
+              }, 600);
+             
+      }else if (e.target.value.length == 0) {
+        const timer = setTimeout(() => {          
+          var requestOptions = {
+            method: 'GET',
+            redirect: 'follow',
+          };
+          
+          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=`, requestOptions)
+            .then(response => response.text())
+            .then(result =>{
+              setUsers(JSON.parse(result))
+            } )
+            .catch(error => console.log('error', error));
+              }, 200);
+      }
+
+
+    }
+
     return(
         <>
           <div className="chatlist">
@@ -65,7 +103,7 @@ const Chatlist = ()=>{
               <div className="modal-content">
                 <div className="chat-header">
                   <div className="msg-search">
-                    <input type="text" className="form-control" id="inlineFormInputGroup" placeholder="Search" aria-label="search"/>
+                    <input onInput={searchConversations} type="text" className="form-control" id="inlineFormInputGroup" placeholder="Search" aria-label="search"/>
                     <a className="add" href="#" onClick={()=>{setModal(!modal)}}>
                       <img className="img-fluid" src={'https://mehedihtml.com/chatbox/assets/img/add.svg'} alt="add" />
                     </a>
@@ -87,11 +125,11 @@ const Chatlist = ()=>{
                 <div className="modal-body">
                   <div className="chat-lists">
                     <div className="tab-content" id="myTabContent">
-                      <div className="tab-pane fade show active mt-4" id="Open" role="tabpanel" aria-labelledby="Open-tab">
+                      <div className="usersscroll tab-pane fade show active mt-4" style={{minHeight:'1500px'}} id="Open" role="tabpanel" aria-labelledby="Open-tab">
                       {
                          Users.map((e,i)=>{
                             return(
-                              <a key={i} href="#" className="d-flex align-items-center">
+                              <a key={i} href="#" className="d-flex align-items-center mb-4">
                               <div className="flex-shrink-0">
                               <BsPersonCircle/>
                                 {/* <img className="img-fluid" src={e.photo} alt="user img"/> */}
