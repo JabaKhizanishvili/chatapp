@@ -4,11 +4,14 @@ import { Modal } from "bootstrap";
 import { Get } from 'react-axios';
 import axios from 'axios';
 import { BsPersonCircle } from 'react-icons/bs'
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 
 
 const Chatlist = ()=>{
     const [modal,setModal] = useState(false);
+    const [pagination, setPagination ] = useState({start: 0, limit: 15});
+
     const [dataFromChild, setDataFromChild] = useState('');
     const handleDataFromChild = (data) => {
       setDataFromChild(data);
@@ -19,7 +22,7 @@ const Chatlist = ()=>{
 
     useEffect(() => {
      
-      fetch('https://jd.self.ge/api/Chat/getConversations')
+      fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}`)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -29,7 +32,8 @@ const Chatlist = ()=>{
       })
       .then(data => {
         // Handle the response data
-        setUsers(JSON.parse(data));
+        let res = data;
+        setUsers(res.data);
       })
       .catch(error => {
         // Handle any errors
@@ -40,7 +44,7 @@ const Chatlist = ()=>{
 
     const ConvAdd = (data)=>{
 
-      fetch('https://jd.self.ge/api/Chat/getConversations')
+      fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}`)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -49,8 +53,11 @@ const Chatlist = ()=>{
         }
       })
       .then(data => {
+        
         // Handle the response data
-        setUsers(JSON.parse(data));
+        // setUsers(JSON.parse(data));
+        let res = data;
+        setUsers(res.data);
       })
       .catch(error => {
         // Handle any errors
@@ -69,10 +76,12 @@ const Chatlist = ()=>{
             redirect: 'follow',
           };
           
-          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}`, requestOptions)
+          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&start=0&limit=15`, requestOptions)
             .then(response => response.text())
             .then(result =>{
-              setUsers(JSON.parse(result))
+              // setUsers(JSON.parse(result))
+              let res = JSON.parse(result);
+        setUsers(res.data);
             } )
             .catch(error => console.log('error', error));
               }, 600);
@@ -84,10 +93,12 @@ const Chatlist = ()=>{
             redirect: 'follow',
           };
           
-          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=`, requestOptions)
+          fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=0&limit=15`, requestOptions)
             .then(response => response.text())
             .then(result =>{
-              setUsers(JSON.parse(result))
+              let res = JSON.parse(result);
+              setUsers(res.data);
+              
             } )
             .catch(error => console.log('error', error));
               }, 200);
@@ -125,9 +136,47 @@ const Chatlist = ()=>{
                 <div className="modal-body">
                   <div className="chat-lists">
                     <div className="tab-content" id="myTabContent">
-                      <div className="usersscroll tab-pane fade show active mt-4" style={{minHeight:'1500px'}} id="Open" role="tabpanel" aria-labelledby="Open-tab">
+                      {/* <div className="usersscroll tab-pane fade show active mt-4" style={{minHeight:'1500px'}} id="Open" role="tabpanel" aria-labelledby="Open-tab"> */}
+                      
+                      
+                      <div
+                      className="usersscroll tab-pane fade show active mt-4" 
+  id="scrollableDiv"
+  style={{
+    height: '70vh',
+    overflow: 'auto',
+  }}
+>
+                      <InfiniteScroll
+    dataLength={Users.length}
+    next={()=>{
+      console.log('asd');
+    }}
+//To put endMessage and loader to the top.
+    // inverse={true}
+    hasMore={true}
+    loader={<h4>Loading...</h4>}
+    scrollableTarget="scrollableDiv"
+  >
+    {Users.map((e,i) => (
+      <a key={i} href="#" className="d-flex align-items-center mb-4">
+                              <div className="flex-shrink-0">
+                              <BsPersonCircle/>
+                                {/* <img className="img-fluid" src={e.photo} alt="user img"/> */}
+                              </div>
+                              <div className="flex-grow-1 ms-3">
+                                <h6>{e.TEXT}</h6>
+                                {/* <p>{e.position}</p> */}
+                              </div>
+                            </a>
+      
+    ))}
+  </InfiniteScroll>
+  </div>
+                      
+                      
                       {
-                         Users.map((e,i)=>{
+                         [].map((e,i)=>{
                             return(
                               <a key={i} href="#" className="d-flex align-items-center mb-4">
                               <div className="flex-shrink-0">
@@ -172,7 +221,7 @@ const Chatlist = ()=>{
                 </div>
               </div>
             </div>
-          </div>
+          {/* </div> */}
 
         </>
     )
