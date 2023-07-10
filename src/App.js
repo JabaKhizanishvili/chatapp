@@ -34,8 +34,8 @@ function App() {
             if(response.data.userid == false){
               return <Home userid={response} />
             }else{
-              return <ProtectedPage/>;
-            }
+              return <ProtectedPage/>;  
+            } 
           }
           // return (<div>Default message before request is made.</div>)
         }}
