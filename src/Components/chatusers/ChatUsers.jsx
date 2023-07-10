@@ -11,7 +11,6 @@ const Chatlist = () => {
   const [users, setUsers] = useState([]);
 
   const fetchUsers = async () => {
-    console.log(pagination);
     try {
       const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}`);
       if (response.ok) {
@@ -80,20 +79,14 @@ const Chatlist = () => {
   const fetchMoreData = async () => {
     const startIndex = pagination.limit * currentPage;
     const endIndex = startIndex + pagination.limit;
-    const data = await fetchData(startIndex, endIndex);
-    const newArray = data.data.map(el => el);
-    setUsers(prevUsers => [...prevUsers, ...newArray]);
-
-
-    // for (let index = startIndex; index < endIndex; index++) {
-    //   try {
-    //     const data = await fetchData(index, pagination.limit);
-    //     const newArray = data.data.map(el => el);
-    //     setUsers(prevUsers => [...prevUsers, ...newArray]);
-    //   } catch (error) {
-    //     console.error('Request failed:', error);
-    //   }
-    // }
+    try {
+          const data = await fetchData(startIndex, endIndex);
+          const newArray = data.data.map(el => el);
+          setUsers(prevUsers => [...prevUsers, ...newArray]);
+        } catch (error) {
+          console.error('Request failed:', error);
+        }
+    
 
     setCurrentPage(prevPage => prevPage + 1);
   };
