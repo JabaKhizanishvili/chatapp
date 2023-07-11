@@ -30,7 +30,6 @@ var requestOptions = {
 fetch("https://jd.self.ge/api/Chat/CreateConversation", requestOptions)
   .then(response => response.text())
   .then(result =>  {
-    // sendDataToParent(false);
     Group('დაემატა')
 
   })

@@ -8,9 +8,10 @@ import {TiDelete} from 'react-icons/ti';
 import Chatlist from '../../Components/chatusers/ChatUsers';
 
 
-const Home = ({userid})=>{
+const Home = ({ userid }) => {
   const [img,setImg] = useState('');
-  const [clipimg,setClipimg] = useState([]);
+  const [clipimg, setClipimg] = useState([]);
+  const [currentUser, setCurrentUser] = useState([]);
   const insertElement = (element) => {
     setClipimg((prevArray) => [...prevArray, element]);
   };
@@ -60,6 +61,9 @@ const removeItem = (index) => {
 
   const [ showEmoji, setShowEmoji] = useState(false);
 
+  const activeUser = (data) => {
+    setCurrentUser(data);
+  }
   useEffect(() => {
    document.getElementById('msg').addEventListener('input', (e) => {
     var convertedText = e.target.value
@@ -103,18 +107,9 @@ const removeItem = (index) => {
 
 
   const SelectEmoji = (e)=>{
-  //  console.log(e);
     const inputField = document.getElementById('msg');
       const startPos = inputField.selectionStart;
       const endPos = inputField.selectionEnd;
-      // const sym = e.unified.split('_'); 
-      // const CodeArr = [];
-      // sym.forEach((e,i) => {
-      //   if(e != ''){
-      //     CodeArr[i] = '0x' + e;
-      //   }
-      // });
-    // console.log(...CodeArr);
 
     let emoji = e.native;
       inputField.value = inputField.value.substring(0, startPos) + emoji + inputField.value.substring(endPos, inputField.value.length);
@@ -127,7 +122,6 @@ const removeItem = (index) => {
     [ReadyState.CLOSED]: 'Closed',
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
-
 
 
 
@@ -167,7 +161,7 @@ const removeItem = (index) => {
     <div className="row">
       <div className="col-12">
         <div className="chat-area">
-         <Chatlist />
+         <Chatlist activeUser={activeUser} />
 
           <div className="chatbox">
             <div className="modal-dialog-scrollable">
@@ -181,8 +175,8 @@ const removeItem = (index) => {
                           {/* <img className="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"> */}
                         </div>
                         <div className="flex-grow-1 ms-3">
-                          <h3>Mehedi Hasan</h3>
-                          <p>front end developer</p>
+                                    <h3>{ typeof(currentUser[0]) !== 'undefined'  ?  currentUser[0].TEXT : ''}</h3>
+                          {/* <p>front end developer</p> */}
                         </div>
                       </div>
                     </div>

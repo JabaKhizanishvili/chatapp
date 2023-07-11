@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useParams ,Link } from 'react-router-dom';
 import CreateConversation from '../createConversation/createConvesation';
 import { BsPersonCircle } from 'react-icons/bs';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-const Chatlist = () => {
+const Chatlist = ({activeUser}) => {
+  const userId = useParams();
   const [modal, setModal] = useState(false);
-  const [pagination, setPagination] = useState({ start: 0, limit: 12, count: false, pages: false });
+  const [pagination, setPagination] = useState({ start: 0, limit: 12, count: false, pages: false, userData : [] });
   const [currentPage, setCurrentPage] = useState(0);
   const [dataFromChild, setDataFromChild] = useState('');
   const [users, setUsers] = useState([]);
@@ -41,14 +43,32 @@ const Chatlist = () => {
     fetchUsers();
   };
 
-  const searchConversations = (e) => {
+  const searchConversations = (e,person_id = '') => {
+    
+    if (person_id != '') {
+      let url = `https://jd.self.ge/api/Chat/searchConversation?text=&person_id=${person_id}&start=0&limit=${1}`;
+      fetch(url)
+        .then(response => response.json())
+        .then(result => {
+          const res = result;
+          setPagination(values => ({
+          ...values,
+          userData: res.data,
+          }));
+          activeUser(res.data)
+           return false;
+        })
+        .catch(error => console.log('error', error));
+      return false;
+    }
+
     clearTimeout(searchConversations.timer);
 
     searchConversations.timer = setTimeout(() => {
       const text = e.target.value;
       let url = `https://jd.self.ge/api/Chat/searchConversation?text=&start=0&limit=${pagination.limit}`;
       if (text.length >= 3) {
-        url = `https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&start=0&limit=${pagination.limit}`;
+        url = `https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&person_id=${person_id}&start=0&limit=${pagination.limit}`;
       }
 
       fetch(url)
@@ -94,6 +114,9 @@ const Chatlist = () => {
   useEffect(() => {
     fetchMoreData();
     fetchUsers();
+    if (userId.id != undefined) {
+      searchConversations('', userId.id)
+    }
   }, []);
 
   return (
@@ -139,18 +162,17 @@ const Chatlist = () => {
                       loader={<h4>Loading...</h4>}
                       scrollableTarget="scrollableDiv"
                     >
-                      {users.map((user, index) => (
-                        <a key={index} href="#" className="d-flex align-items-center mt-4 pb-2 mb-12">
-                          <div className="flex-shrink-0">
-                            <BsPersonCircle />
-                            {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
-                          </div>
-                          <div className="flex-grow-1 ms-3">
+                     {users.map((user, index) => (
+                          <Link key={index} to={`/${user.PERSON_ID}`} id={user.PERSON_ID} className="d-flex align-items-center mt-4 pb-2 mb-12">
+                         <div className="flex-shrink-0">
+                         <BsPersonCircle />
+                         {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
+                         </div>
+                           <div className="flex-grow-1 ms-3">
                             <h6>{user.TEXT}</h6>
-                            {/* <p>{user.position}</p> */}
-                          </div>
-                        </a>
-                      ))}
+                           </div>
+                         </Link>
+                       ))}
                     </InfiniteScroll>
                   </div>
                 </div>

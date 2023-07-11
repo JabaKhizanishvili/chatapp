@@ -1,47 +1,60 @@
 import './App.css';
-import { useState , useEffect } from "react";
+import { useState, useEffect } from 'react';
 import Home from './Pages/Home/home';
 import About from './Pages/About/about';
-import {Route, Routes} from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import { ProtectedPage } from './Pages/ProtectedPage/index';
-import { AxiosProvider, Request, Get, Delete, Head, Post, Put, Patch, withAxios } from 'react-axios'
+import axios from 'axios';
 
 function App() {
-  return(
-  <>
-  {/* <Routes>
-    {
-      !Auth ? 
-<Route path='/' element={<ProtectedPage/>}/> 
-:
-<Route path='/' element={<Home/>}></Route>
-    }    
-  </Routes> */}
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [response, setResponse] = useState(null);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  <Get url="https://jd.self.ge/api/Chat/IsLogged" params={{}}>
-        {(error, response, isLoading, makeRequest, axios) => {
-          if(error) {
-            return <ProtectedPage/>;
-            return (<div>Something bad happened: {error.message} <button onClick={() => makeRequest({ params: { reload: true } })}>Retry</button></div>)
-          }
-          else if(isLoading) {
-            return (<div className='w-100 text-center align-middle' style={{top:'50%', position:'absolute'}}> Loading...</div>)
-          }
-          else if(response !== null) {
-            // return (<div>{response.data.message} <button onClick={() => makeRequest({ params: { refresh: true } })}>Refresh</button></div>)
-            if(response.data.userid == false){
-              return <Home userid={response} />
-            }else{
-              return <ProtectedPage/>;  
-            } 
-          }
-          // return (<div>Default message before request is made.</div>)
-        }}
-      </Get>
-  </>
-  );
+  const fetchData = () => {
+    axios
+      .get('https://jd.self.ge/api/Chat/IsLogged')
+      .then((response) => {
+        setResponse(response.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setIsLoading(false);
+      });
+  };
+
+  if (error) {
+    return (
+      <div>
+        {/* <ProtectedPage /> */}
+        Something bad happened: {error.message}
+        <button onClick={() => fetchData({ reload: true })}>Retry</button>
+      </div>
+    );
+  } else if (isLoading) {
+    return (
+      <div className="w-100 text-center align-middle" style={{ top: '50%', position: 'absolute' }}>
+        Loading...
+      </div>
+    );
+  } else if (response.userid !== null) {
+    return (
+      <Routes>
+        <Route path="/" element={<Home userid={response} />} />
+        <Route path="/:id" element={<Home />} />
+      </Routes>
+    );
+  } else if( response.userid == null) {
+    return <ProtectedPage />
+  }
+
+  return null;
 }
 
 export default App;
