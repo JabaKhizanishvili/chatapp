@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useParams ,Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import CreateConversation from '../createConversation/createConvesation';
 import { BsPersonCircle } from 'react-icons/bs';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-const Chatlist = ({activeUser}) => {
+const Chatlist = ({ activeUser }) => {
   const userId = useParams();
+  const location = useLocation();
   const [modal, setModal] = useState(false);
-  const [pagination, setPagination] = useState({ start: 0, limit: 12, count: false, pages: false, userData : [] });
+  const [pagination, setPagination] = useState({ start: 0, limit: 12, count: false, pages: false, userData: [] });
   const [currentPage, setCurrentPage] = useState(0);
   const [dataFromChild, setDataFromChild] = useState('');
   const [users, setUsers] = useState([]);
@@ -43,20 +44,19 @@ const Chatlist = ({activeUser}) => {
     fetchUsers();
   };
 
-  const searchConversations = (e,person_id = '') => {
-    
-    if (person_id != '') {
+  const searchConversations = (e, person_id = '') => {
+    if (person_id !== '') {
       let url = `https://jd.self.ge/api/Chat/searchConversation?text=&person_id=${person_id}&start=0&limit=${1}`;
       fetch(url)
         .then(response => response.json())
         .then(result => {
           const res = result;
           setPagination(values => ({
-          ...values,
-          userData: res.data,
+            ...values,
+            userData: res.data,
           }));
-          activeUser(res.data)
-           return false;
+          activeUser(res.data);
+          return false;
         })
         .catch(error => console.log('error', error));
       return false;
@@ -100,13 +100,12 @@ const Chatlist = ({activeUser}) => {
     const startIndex = pagination.limit * currentPage;
     const endIndex = startIndex + pagination.limit;
     try {
-          const data = await fetchData(startIndex, endIndex);
-          const newArray = data.data.map(el => el);
-          setUsers(prevUsers => [...prevUsers, ...newArray]);
-        } catch (error) {
-          console.error('Request failed:', error);
-        }
-    
+      const data = await fetchData(startIndex, endIndex);
+      const newArray = data.data.map(el => el);
+      setUsers(prevUsers => [...prevUsers, ...newArray]);
+    } catch (error) {
+      console.error('Request failed:', error);
+    }
 
     setCurrentPage(prevPage => prevPage + 1);
   };
@@ -117,7 +116,7 @@ const Chatlist = ({activeUser}) => {
     if (userId.id != undefined) {
       searchConversations('', userId.id)
     }
-  }, []);
+  }, [location]);
 
   return (
     <>
@@ -162,17 +161,22 @@ const Chatlist = ({activeUser}) => {
                       loader={<h4>Loading...</h4>}
                       scrollableTarget="scrollableDiv"
                     >
-                     {users.map((user, index) => (
-                          <Link key={index} to={`/${user.PERSON_ID}`} id={user.PERSON_ID} className="d-flex align-items-center mt-4 pb-2 mb-12">
-                         <div className="flex-shrink-0">
-                         <BsPersonCircle />
-                         {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
-                         </div>
-                           <div className="flex-grow-1 ms-3">
+                      {users.map((user, index) => (
+                        <Link
+                          key={index}
+                          to={`/${user.PERSON_ID}`}
+                          id={user.PERSON_ID}
+                          className="d-flex align-items-center mt-4 pb-2 mb-12"
+                        >
+                          <div className="flex-shrink-0">
+                            <BsPersonCircle />
+                            {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
+                          </div>
+                          <div className="flex-grow-1 ms-3">
                             <h6>{user.TEXT}</h6>
-                           </div>
-                         </Link>
-                       ))}
+                          </div>
+                        </Link>
+                      ))}
                     </InfiniteScroll>
                   </div>
                 </div>
