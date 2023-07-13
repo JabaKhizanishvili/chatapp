@@ -10,7 +10,7 @@ const WebSocketConnection = ({ response }) => {
   const [messageHistory, setMessageHistory] = useState([]);
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
  
-  console.log(socketUrl);
+  // console.log(socketUrl);
   useEffect(() => {
      if (!Helper.isEmpty(response)) {
        setSocketUrl('wss://jd.self.ge:8080/chat?id=' + response.userid.ID)

@@ -6,10 +6,11 @@ import { BiSmile } from 'react-icons/bi';
 import { TiDelete } from 'react-icons/ti';
 import Chatlist from '../../Components/chatusers/ChatUsers';
 import './home.css';
-import {C} from '../../helper';
+import { C } from '../../helper';
+import XApiClient from '../../ApiClient';
 
 const Home = ({ userid }) => {
-  // console.log(userid);
+  const SendMsgApi = new XApiClient('https://jd.self.ge');
   const [img, setImg] = useState('');
   const [clipimg, setClipimg] = useState([]);
   const [currentUser, setCurrentUser] = useState([]);
@@ -67,15 +68,24 @@ const Home = ({ userid }) => {
   }, [lastMessage, setMessageHistory]);
 
   const handleClickChangeSocketUrl = useCallback(() => {
-    setSocketUrl('wss://jd.self.ge:8080/chat');
+    setSocketUrl('wss://jd.self.ge:8080/createMsg');
   }, []);
+
+
+     const handleFormSubmit = (event) => {
+        event.preventDefault();
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      };
 
   const SubmitMsg = (e) => {
     e.preventDefault();
     if (e.target[0].value === '') {
       return false;
     }
-    sendMessage(e.target[0].value);
+
+    sendMessage( JSON.stringify({msg:e.target[0].value, reciver : currentUser.ID }));
     e.target[0].value = '';
     let msgbody = document.querySelector('.msg-body');
     if (msgbody != null) {
