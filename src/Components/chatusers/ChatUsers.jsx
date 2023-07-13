@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { useParams, Link, useLocation } from 'react-router-dom';
-import CreateConversation from '../createConversation/createConvesation';
+import React, { useEffect, useState } from "react";
 import { BsPersonCircle } from 'react-icons/bs';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { Link, useLocation } from 'react-router-dom';
+import CreateConversation from '../createConversation/createConvesation';
+import { Helper, C } from '../../helper';
 
 const Chatlist = ({ activeUser }) => {
-  const userId = useParams();
   const location = useLocation();
   const [modal, setModal] = useState(false);
   const [pagination, setPagination] = useState({ start: 0, limit: 12, count: false, pages: false, userData: [] });
@@ -111,12 +111,25 @@ const Chatlist = ({ activeUser }) => {
   };
 
   useEffect(() => {
+    setCurrentPage(0);
+    setPagination(values => ({
+      ...values,
+      start: 0,
+      limit: 12
+    }));
     fetchMoreData();
     fetchUsers();
-    if (userId.id != undefined) {
-      searchConversations('', userId.id)
+    let userID = localStorage.getItem('jd.self.ge-activeUserId');
+    if ( !Helper.isEmpty(userID)) {
+       searchConversations('', userID )  
     }
-  }, [location]);
+
+  }, []);
+
+  const handleUserClick = (userId) => {
+    localStorage.setItem('jd.self.ge-activeUserId', userId);
+    searchConversations('', localStorage.getItem('jd.self.ge-activeUserId'))
+  };
 
   return (
     <>
@@ -162,20 +175,22 @@ const Chatlist = ({ activeUser }) => {
                       scrollableTarget="scrollableDiv"
                     >
                       {users.map((user, index) => (
-                        <Link
+                        <div
                           key={index}
-                          to={`/${user.PERSON_ID}`}
-                          id={user.PERSON_ID}
-                          className="d-flex align-items-center mt-4 pb-2 mb-12"
+                          style={{cursor:'pointer'}}
+                          onClick={() => handleUserClick(user.PERSON_ID)}
+                          className="d-flex align-items-center mt-4 pb-2 mb-12 cursor-auto"
                         >
                           <div className="flex-shrink-0">
                             <BsPersonCircle />
                             {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
                           </div>
-                          <div className="flex-grow-1 ms-3">
+                          <div className="flex-grow-1 ms-3
+
+">
                             <h6>{user.TEXT}</h6>
                           </div>
-                        </Link>
+                        </div>
                       ))}
                     </InfiniteScroll>
                   </div>

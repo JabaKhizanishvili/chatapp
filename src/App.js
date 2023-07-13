@@ -1,11 +1,11 @@
-import './App.css';
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import axios from 'axios';
+
 import Home from './Pages/Home/home';
 import About from './Pages/About/about';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import { ProtectedPage } from './Pages/ProtectedPage/index';
-import axios from 'axios';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +34,7 @@ function App() {
       <div>
         {/* <ProtectedPage /> */}
         Something bad happened: {error.message}
-        <button onClick={() => fetchData({ reload: true })}>Retry</button>
+        <button onClick={fetchData}>Retry</button>
       </div>
     );
   } else if (isLoading) {
@@ -43,18 +43,26 @@ function App() {
         Loading...
       </div>
     );
-  } else if (response.userid !== null) {
+  } else if (response && response.userid) {
+    return <Home userid={response} />;
     return (
-      <Routes>
-        <Route path="/" element={<Home userid={response} />} />
-        <Route path="/:id" element={<Home />} />
-      </Routes>
+        <Routes>
+          <Route path="" element={<Home userid={response} />} />
+          {/* <Route path="/chat/:id" element={<Home userid={response} />} /> */}
+        </Routes>
     );
-  } else if( response.userid == null) {
-    return <ProtectedPage />
+  } else {
+    return <ProtectedPage />;
+    return (
+      <>
+       <Home userid={response} />
+        // <Routes>
+          {/* <Route path="" element={<Home userid={response} />} /> */}
+          {/* <Route path="/chat/:id" element={<Home userid={response} />} /> */}
+        // </Routes>
+      </>
+    );
   }
-
-  return null;
 }
 
 export default App;

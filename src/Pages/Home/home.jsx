@@ -6,8 +6,10 @@ import { BiSmile } from 'react-icons/bi';
 import { TiDelete } from 'react-icons/ti';
 import Chatlist from '../../Components/chatusers/ChatUsers';
 import './home.css';
+import {C} from '../../helper';
 
 const Home = ({ userid }) => {
+  // console.log(userid);
   const [img, setImg] = useState('');
   const [clipimg, setClipimg] = useState([]);
   const [currentUser, setCurrentUser] = useState([]);
@@ -37,7 +39,8 @@ const Home = ({ userid }) => {
     }
   };
 
-  const [socketUrl, setSocketUrl] = useState('wss://jd.self.ge:8080/chat');
+  let url = 'wss://jd.self.ge:8080/chat?id=' + C._('userid', userid).ID;
+  const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
