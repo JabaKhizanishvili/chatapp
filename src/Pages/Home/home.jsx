@@ -1,53 +1,17 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
-import { BiSmile } from 'react-icons/bi';
-import { TiDelete } from 'react-icons/ti';
+import MessageInput from '../../Components/messageInput/MessageInput';
 import Chatlist from '../../Components/chatusers/ChatUsers';
 import './home.css';
 import { C } from '../../helper';
-import XApiClient from '../../ApiClient';
 
 const Home = ({ userid }) => {
-  const SendMsgApi = new XApiClient('https://jd.self.ge');
-  const [img, setImg] = useState('');
-  const [clipimg, setClipimg] = useState([]);
   const [currentUser, setCurrentUser] = useState([]);
-
-  const insertElement = (element) => {
-    setClipimg((prevArray) => [...prevArray, element]);
-  };
-
-  const removeItem = (index) => {
-    const newArray = [...clipimg];
-    newArray.splice(index, 1);
-    setClipimg(newArray);
-  };
-
-  const handlePaste = (event) => {
-    const items = event.clipboardData.items;
-
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-
-      if (item.kind === 'file') {
-        const file = item.getAsFile();
-        insertElement(item);
-        // Handle the file as needed
-        // console.log('Pasted file:', file);
-      }
-    }
-  };
-
   let url = 'wss://jd.self.ge:8080/chat?id=' + C._('userid', userid).ID;
   const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
-
-  const [showEmoji, setShowEmoji] = useState(false);
-
   const activeUser = (data) => {
     setCurrentUser(data);
   };
@@ -71,44 +35,9 @@ const Home = ({ userid }) => {
     setSocketUrl('wss://jd.self.ge:8080/createMsg');
   }, []);
 
-
      const handleFormSubmit = (event) => {
         event.preventDefault();
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
       };
-
-  const SubmitMsg = (e) => {
-    e.preventDefault();
-    if (e.target[0].value === '') {
-      return false;
-    }
-
-    sendMessage( JSON.stringify({msg:e.target[0].value, reciver : currentUser.ID }));
-    e.target[0].value = '';
-    let msgbody = document.querySelector('.msg-body');
-    if (msgbody != null) {
-      setTimeout(function () {
-        msgbody.scrollTo({
-          top: document.querySelector('.msg-body ul').scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 100);
-    }
-  };
-
-  const SelectEmoji = (e) => {
-    const inputField = document.getElementById('msg');
-    const startPos = inputField.selectionStart;
-    const endPos = inputField.selectionEnd;
-
-    let emoji = e.native;
-    inputField.value =
-      inputField.value.substring(0, startPos) +
-      emoji +
-      inputField.value.substring(endPos, inputField.value.length);
-  };
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -164,96 +93,7 @@ const Home = ({ userid }) => {
                             })}
                           </ul>
                         </div>
-
-                        <div className="send-box">
-                          <form
-                            action=""
-                            encType="multipart/form-data"
-                            onSubmit={SubmitMsg}
-                          >
-                            <input
-                              type="text"
-                              id="msg"
-                              className="form-control"
-                              aria-label="message…"
-                              placeholder="Write message…"
-                              onPaste={handlePaste}
-                            />
-                            <button type="submit">
-                              <i className="fa fa-paper-plane" aria-hidden="true"></i>{' '}
-                              Send
-                            </button>
-                          </form>
-
-                          <div className="send-btns">
-                            <div className="attach">
-                              <div className="button-wrapper">
-                                <span className="label">
-                                  <img
-                                    className="img-fluid"
-                                    src="https://mehedihtml.com/chatbox/assets/img/upload.svg"
-                                    alt="image title"
-                                  />{' '}
-                                  attached file
-                                </span>
-                                <input
-                                  type="file"
-                                  name="upload"
-                                  id="upload"
-                                  className="upload-box"
-                                  placeholder="Upload File"
-                                  aria-label="Upload File"
-                                />
-                              </div>
-
-                              <BiSmile
-                                onClick={() => {
-                                  setShowEmoji(!showEmoji);
-                                }}
-                              />
-                              {showEmoji ? (
-                                <Picker
-                                  data={data}
-                                  onEmojiSelect={SelectEmoji}
-                                />
-                              ) : (
-                                ''
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="container w-100 files">
-                          <ul>
-                            {clipimg.map((item, i) => {
-                              var file;
-                              var reader = new FileReader();
-                              if (item.kind === 'file') {
-                                file = item.getAsFile();
-                                var result;
-                                reader.onload = function (event) {
-                                  result = event.target.result;
-                                  setImg(result);
-                                };
-                                reader.readAsDataURL(file);
-                                return (
-                                  <li key={i} className="mt-2">
-                                    <img
-                                      src={img}
-                                      style={{ width: '60px' }}
-                                      alt="err"
-                                    />
-                                    <TiDelete
-                                      style={{ cursor: 'pointer' }}
-                                      onClick={() => {
-                                        removeItem(i);
-                                      }}
-                                    />
-                                  </li>
-                                );
-                              }
-                            })}
-                          </ul>
-                        </div>
+                        <MessageInput currentUser={currentUser} sendMessage={sendMessage} userid={userid} />
                       </div>
                     </div>
                   </div>

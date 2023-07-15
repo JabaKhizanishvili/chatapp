@@ -5,6 +5,7 @@ import makeAnimated from 'react-select/animated';
 import {AiOutlineCloseCircle} from 'react-icons/ai';
 import axios from 'axios';
 import { useFetcher } from 'react-router-dom';
+import { Helper } from '../../helper';
 
 const animatedComponents = makeAnimated();
 const CreateConversation = ({ sendDataToParent, Group })=>{
@@ -12,6 +13,9 @@ const CreateConversation = ({ sendDataToParent, Group })=>{
     const handleFormSubmit = (event) => {
         event.preventDefault();
 
+        if (Helper.isEmpty(values.TEXT)) {
+           return false;
+        }
         var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -26,7 +30,6 @@ var requestOptions = {
   body: urlencoded,
   redirect: 'follow'
 };
-
 fetch("https://jd.self.ge/api/Chat/CreateConversation", requestOptions)
   .then(response => response.text())
   .then(result =>  {

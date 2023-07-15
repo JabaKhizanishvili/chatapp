@@ -14,7 +14,7 @@ export default class XApiClient {
     for (const i in values) {
       urlencoded.append(i, values[i]);
     }
-
+    console.log(urlencoded);
     var requestOptions = {
       method: 'POST',
       headers: myHeaders,
@@ -22,9 +22,10 @@ export default class XApiClient {
       redirect: 'follow'
     };
 
-    fetch(`${this.apiUrl}/api/Chat/CreateConversation`, requestOptions)
+    fetch(`${this.apiUrl}/api/Chat/createMsg`, requestOptions)
       .then(response => response.text())
       .then(result => {
+        console.log(result);
           return result;
       })
       .catch(error => error.message);
