@@ -12,7 +12,7 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
   const [img, setImg] = useState("");
   const [clipimg, setClipimg] = useState([]);
   const [values, setValues] = useState({
-    MESSAGE: "",
+    MASSAGE: "",
     SENDER_PERSON: "",
     CHAT_GROUP_ID: "",
     REPLY_ID: "",
@@ -56,7 +56,8 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
       return false;
     }
     values.CHAT_GROUP_ID = currentUser[0].GROUP_ID;
-    values.SENDER_PERSON = C._('userid', userid).ID;
+    // values.SENDER_PERSON = C._('userid', userid).ID == 'undefined' ? 99 : C._('userid', userid).ID;
+    values.SENDER_PERSON = 80353;
     SendMsgApi.handleFormSubmit(e,values);
 
     sendMessage(JSON.stringify({ msg: e.target[0].value, reciver: currentUser.ID }));
@@ -70,14 +71,14 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
         });
       }, 100);
     }
-    values.MESSAGE = '';
+    values.MASSAGE = '';
   };
 
   function handleChange(e) {
     let key = e.target.className;
     switch (key) {
-      case 'MESSAGE form-control':
-        key = 'MESSAGE';
+      case 'MASSAGE form-control':
+        key = 'MASSAGE';
         break;
     }
     const value = e.target.value
@@ -100,8 +101,8 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
           <input
             type="text"
             id="msg"
-            value={values.MESSAGE}
-            className="MESSAGE form-control"
+            value={values.MASSAGE}
+            className="MASSAGE form-control"
             aria-label="message…"
             placeholder="Write message…"
             onPaste={handlePaste}

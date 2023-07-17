@@ -14,7 +14,6 @@ export default class XApiClient {
     for (const i in values) {
       urlencoded.append(i, values[i]);
     }
-    console.log(urlencoded);
     var requestOptions = {
       method: 'POST',
       headers: myHeaders,
@@ -25,11 +24,26 @@ export default class XApiClient {
     fetch(`${this.apiUrl}/api/Chat/createMsg`, requestOptions)
       .then(response => response.text())
       .then(result => {
-        console.log(result);
+        // console.log(result);
           return result;
       })
       .catch(error => error.message);
   };
+
+  getMessages = (group_id) => {
+    var requestOptions = {
+      method: 'GET',
+      redirect: 'follow'
+    };
+
+    fetch(`${this.apiUrl}/api/Chat/getMsg?group_id=${group_id}`, requestOptions)
+    .then(response => response.text())
+      .then(result => {
+        return result;
+      })
+    .catch(error => console.log('error', error));
+    
+  }
 
 
 

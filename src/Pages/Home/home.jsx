@@ -1,43 +1,64 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import MessageInput from '../../Components/messageInput/MessageInput';
 import Chatlist from '../../Components/chatusers/ChatUsers';
 import './home.css';
 import { C } from '../../helper';
+import XApiClient from '../../ApiClient';
 
 const Home = ({ userid }) => {
+  const getMsg = new XApiClient('https://jd.self.ge');
   const [currentUser, setCurrentUser] = useState([]);
-  let url = 'wss://jd.self.ge:8080/chat?id=' + C._('userid', userid).ID;
+  const url = 'wss://jd.self.ge:8080/chat?id=' + C._('userid', userid).ID;
   const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
-  const activeUser = (data) => {
+  const activeUser = useCallback((data) => {
     setCurrentUser(data);
-  };
-
-  useEffect(() => {
-    document.getElementById('msg').addEventListener('input', (e) => {
-      var convertedText = e.target.value
-        .replace(/<3/g, '❤️')
-        .replace(/:D/g, '😀')
-        .replace(/3:\)/g, '😈');
-
-      e.target.value = convertedText;
-    });
-
-    if (lastMessage !== null) {
-      setMessageHistory((prev) => prev.concat(lastMessage));
-    }
-  }, [lastMessage, setMessageHistory]);
-
-  const handleClickChangeSocketUrl = useCallback(() => {
-    setSocketUrl('wss://jd.self.ge:8080/createMsg');
   }, []);
 
-     const handleFormSubmit = (event) => {
-        event.preventDefault();
-      };
+  useEffect(() => {
+    const fetchMessageHistory = async () => {
+      try {
+        const response = await fetch(`https://jd.self.ge/api/Chat/getMsg?group_id=${currentUser[0].GROUP_ID}`);
+        const result = await response.json();
+        setMessages(result.data.map(element => ({
+          data: JSON.stringify(element)
+        })));
+      } catch (error) {
+        console.log('error', error);
+      }
+    };
+
+    if (currentUser.length > 0) {
+      fetchMessageHistory();
+    }
+    setMessageHistory(messages);
+    return () => {
+      // Cleanup code here
+    };
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
+    }
+  }, [lastMessage]);
+
+  const memoizedMessageHistory = useMemo(() => {
+    return messageHistory.map((message, index) => {
+      const jsonObject = JSON.parse(message.data);
+      return (
+        <li key={index} className={'sender'}>
+          <p>{jsonObject.message}</p>
+          <p>{jsonObject.MASSAGE}</p>
+          <span className="time">{'11:00'}</span>
+        </li>
+      );
+    });
+  }, [messageHistory]);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -48,62 +69,47 @@ const Home = ({ userid }) => {
   }[readyState];
 
   return (
-    <>
-      <div className="container">
-        <section className="message-area">
-          <div className="">
-            <div className="row">
-              <div className="col-12">
-                <div className="chat-area">
-                  <Chatlist activeUser={activeUser} />
+    <div className="container">
+      <section className="message-area">
+        <div className="">
+          <div className="row">
+            <div className="col-12">
+              <div className="chat-area">
+                <Chatlist activeUser={activeUser} />
 
-                  <div className="chatbox">
-                    <div className="modal-dialog-scrollable">
-                      <div className="modal-content">
-                        <div className="msg-head">
-                          <div className="row">
-                            <div className="col-8">
-                              <div className="d-flex align-items-center">
-                                <div className="flex-shrink-0">
-                                  <div className="flex-grow-1 ms-3">
-                                    <h3>
-                                      {typeof currentUser[0] !== 'undefined'
-                                        ? currentUser[0].TEXT
-                                        : ''}
-                                    </h3>
-                                  </div>
+                <div className="chatbox">
+                  <div className="modal-dialog-scrollable">
+                    <div className="modal-content">
+                      <div className="msg-head">
+                        <div className="row">
+                          <div className="col-8">
+                            <div className="d-flex align-items-center">
+                              <div className="flex-shrink-0">
+                                <div className="flex-grow-1 ms-3">
+                                  <h3>
+                                    {currentUser[0]?.TEXT || ''}
+                                  </h3>
                                 </div>
                               </div>
                             </div>
-                            <div className="col-4"></div>
                           </div>
+                          <div className="col-4"></div>
                         </div>
-
-                        <div className="msg-body">
-                          <ul>
-                            {messageHistory.map((e, i) => {
-                              let data = e.data;
-                              const jsonObject = JSON.parse(data);
-                              return (
-                                <li key={i} className={'sender'}>
-                                  <p> {jsonObject['message']} </p>
-                                  <span className="time">{'11:00'}</span>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                        <MessageInput currentUser={currentUser} sendMessage={sendMessage} userid={userid} />
                       </div>
+
+                      <div className="msg-body">
+                        <ul>{memoizedMessageHistory}</ul>
+                      </div>
+                      <MessageInput currentUser={currentUser} sendMessage={sendMessage} userid={userid} />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-      </div>
-    </>
+        </div>
+      </section>
+    </div>
   );
 };
 
