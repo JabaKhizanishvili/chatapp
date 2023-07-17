@@ -9,7 +9,8 @@ import XApiClient from '../../ApiClient';
 const Home = ({ userid }) => {
   const getMsg = new XApiClient('https://jd.self.ge');
   const [currentUser, setCurrentUser] = useState([]);
-  const url = 'wss://jd.self.ge:8080/chat?id=' + C._('userid', userid).ID;
+  let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
+  const url = 'wss://jd.self.ge:8080/chat?id=' + user_id;
   const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // New state for loading status
@@ -47,7 +48,9 @@ const Home = ({ userid }) => {
 
   useEffect(() => {
     if (lastMessage !== null) {
-      setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
+      if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {        
+        setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
+      }
     }
   }, [lastMessage]);
 

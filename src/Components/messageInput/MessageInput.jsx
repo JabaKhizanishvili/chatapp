@@ -56,12 +56,12 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
       return false;
     }
     values.CHAT_GROUP_ID = currentUser[0].GROUP_ID;
-    // values.SENDER_PERSON = C._('userid', userid).ID == 'undefined' ? 99 : C._('userid', userid).ID;
-    values.SENDER_PERSON = 80353;
+    values.SENDER_PERSON = typeof(C._('userid', userid).ID ) == 'undefined' ? 80353 : C._('userid', userid).ID;
+    // values.SENDER_PERSON = 80353;
     SendMsgApi.handleFormSubmit(e,values);
 
-    const message = { msg: e.target[0].value, person: currentUser.ID };
-sendMessage(JSON.stringify(message));
+    const message = { msg: e.target[0].value, person: currentUser[0].PERSON_ID };
+    sendMessage(JSON.stringify(message));
     // sendMessage(JSON.stringify(
     //   {
     //     msg: e.target[0].value,
