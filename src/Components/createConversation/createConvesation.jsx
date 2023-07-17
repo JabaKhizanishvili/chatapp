@@ -4,12 +4,16 @@ import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import {AiOutlineCloseCircle} from 'react-icons/ai';
 import axios from 'axios';
-import { useFetcher } from 'react-router-dom';
+import { json, useFetcher } from 'react-router-dom';
 import { Helper } from '../../helper';
+import { C } from '../../helper';
+import { type } from '@testing-library/user-event/dist/type';
+
 
 const animatedComponents = makeAnimated();
-const CreateConversation = ({ sendDataToParent, Group })=>{
+const CreateConversation = ({ sendDataToParent, Group, userid })=>{
 
+  const [validate, setValidate] = useState(false);
     const handleFormSubmit = (event) => {
         event.preventDefault();
 
@@ -32,20 +36,27 @@ var requestOptions = {
 };
 fetch("https://jd.self.ge/api/Chat/CreateConversation", requestOptions)
   .then(response => response.text())
-  .then(result =>  {
+  .then(result => {
+    let res = JSON.parse(result);
+    if (JSON.parse(res).validate) {
+      setValidate(true)
+    } else {
+       sendDataToParent(false);
+    }
     Group('დაემატა')
 
   })
   .catch(error => console.log('error', error));
 
 
-  sendDataToParent(false);
+ 
       };
 
 
       const [values, setValues] = useState({
         TEXT: "",
         PERSON_ID: "",
+        CREATOR_ID: typeof(C._('userid', userid).ID) != 'undefined' ? C._('userid', userid).ID : 212
       })
 
       function handleChange(e) {
@@ -132,7 +143,11 @@ fetch("https://jd.self.ge/api/Chat/CreateConversation", requestOptions)
       }))
       }}
     />
-          <button type="submit">create</button>
+              <button type="submit">create</button>
+              
+              {validate &&
+              <p className='alert text-danger'>already exists !</p>
+              }
         </form>
       </div>
     </div>

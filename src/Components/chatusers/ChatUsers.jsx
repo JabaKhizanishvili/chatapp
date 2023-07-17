@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import CreateConversation from '../createConversation/createConvesation';
 import { Helper, C } from '../../helper';
 
-const Chatlist = ({ activeUser }) => {
+const Chatlist = ({ activeUser, userid }) => {
   const location = useLocation();
   const [modal, setModal] = useState(false);
   const [pagination, setPagination] = useState({ start: 0, limit: 12, count: false, pages: false, userData: [] });
@@ -142,7 +142,7 @@ const Chatlist = ({ activeUser }) => {
                 <a className="add" href="#" onClick={() => { setModal(!modal) }}>
                   <img className="img-fluid" src={'https://mehedihtml.com/chatbox/assets/img/add.svg'} alt="add" />
                 </a>
-                {modal && <CreateConversation sendDataToParent={handleDataFromChild} Group={ConvAdd} />}
+                {modal && <CreateConversation sendDataToParent={handleDataFromChild} Group={ConvAdd} userid={userid} />}
               </div>
 
               <ul className="nav nav-tabs" id="myTab" role="tablist">

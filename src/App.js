@@ -52,7 +52,7 @@ function App() {
         </Routes>
     );
   } else {
-    // return <ProtectedPage />;
+    return <ProtectedPage />;
     return (
       <>
        <Home userid={response} />

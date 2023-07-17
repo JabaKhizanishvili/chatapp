@@ -60,7 +60,13 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
     values.SENDER_PERSON = 80353;
     SendMsgApi.handleFormSubmit(e,values);
 
-    sendMessage(JSON.stringify({ msg: e.target[0].value, reciver: currentUser.ID }));
+    const message = { msg: e.target[0].value, person: currentUser.ID };
+sendMessage(JSON.stringify(message));
+    // sendMessage(JSON.stringify(
+    //   {
+    //     msg: e.target[0].value,
+    //     person: currentUser.ID
+    //   }));
     
     let msgbody = document.querySelector(".msg-body");
     if (msgbody != null) {

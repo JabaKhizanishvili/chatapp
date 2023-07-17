@@ -66,7 +66,7 @@ const Home = ({ userid }) => {
           <div className="row">
             <div className="col-12">
               <div className="chat-area">
-                <Chatlist activeUser={activeUser} />
+                <Chatlist activeUser={activeUser} userid={userid} />
 
                 <div className="chatbox">
                   <div className="modal-dialog-scrollable">
