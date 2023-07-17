@@ -13,6 +13,7 @@ const Home = ({ userid }) => {
   const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // New state for loading status
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   const activeUser = useCallback((data) => {
@@ -27,15 +28,20 @@ const Home = ({ userid }) => {
         setMessages(result.data.map(element => ({
           data: JSON.stringify(element)
         })));
+        setMessageHistory(messages);
       } catch (error) {
         console.log('error', error);
+      } finally {
+        setIsLoading(false); // Set loading status to false when API call completes
       }
     };
 
     if (currentUser.length > 0) {
+      setIsLoading(true); // Set loading status to true before API call
       fetchMessageHistory();
+      
     }
-    setMessageHistory(messages);
+
     return () => {
       // Cleanup code here
     };
@@ -98,7 +104,11 @@ const Home = ({ userid }) => {
                       </div>
 
                       <div className="msg-body">
-                        <ul>{memoizedMessageHistory}</ul>
+                        {isLoading ? ( // Display preloader while loading
+                          <div>Loading...</div>
+                        ) : (
+                          <ul>{memoizedMessageHistory}</ul> // Render message history
+                        )}
                       </div>
                       <MessageInput currentUser={currentUser} sendMessage={sendMessage} userid={userid} />
                     </div>
