@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import MessageInput from '../../Components/messageInput/MessageInput';
 import Chatlist from '../../Components/chatusers/ChatUsers';
@@ -12,23 +12,23 @@ const Home = ({ userid }) => {
   const url = 'wss://jd.self.ge:8080/chat?id=' + C._('userid', userid).ID;
   const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // New state for loading status
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   const activeUser = useCallback((data) => {
     setCurrentUser(data);
+    setIsLoading(true); // Set loading status to true when user changes
   }, []);
 
   useEffect(() => {
     const fetchMessageHistory = async () => {
       try {
+        setIsLoading(true); // Set loading status to true before API call
         const response = await fetch(`https://jd.self.ge/api/Chat/getMsg?group_id=${currentUser[0].GROUP_ID}`);
         const result = await response.json();
-        setMessages(result.data.map(element => ({
+        setMessageHistory(result.data.map(element => ({
           data: JSON.stringify(element)
         })));
-        setMessageHistory(messages);
       } catch (error) {
         console.log('error', error);
       } finally {
@@ -37,9 +37,7 @@ const Home = ({ userid }) => {
     };
 
     if (currentUser.length > 0) {
-      setIsLoading(true); // Set loading status to true before API call
       fetchMessageHistory();
-      
     }
 
     return () => {
@@ -52,19 +50,6 @@ const Home = ({ userid }) => {
       setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
     }
   }, [lastMessage]);
-
-  const memoizedMessageHistory = useMemo(() => {
-    return messageHistory.map((message, index) => {
-      const jsonObject = JSON.parse(message.data);
-      return (
-        <li key={index} className={'sender'}>
-          <p>{jsonObject.message}</p>
-          <p>{jsonObject.MASSAGE}</p>
-          <span className="time">{'11:00'}</span>
-        </li>
-      );
-    });
-  }, [messageHistory]);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -107,7 +92,18 @@ const Home = ({ userid }) => {
                         {isLoading ? ( // Display preloader while loading
                           <div>Loading...</div>
                         ) : (
-                          <ul>{memoizedMessageHistory}</ul> // Render message history
+                          <ul>
+                            {messageHistory.map((message, index) => {
+                              const jsonObject = JSON.parse(message.data);
+                              return (
+                                <li key={index} className={'sender'}>
+                                  <p>{jsonObject.message}</p>
+                                  <p>{jsonObject.MASSAGE}</p>
+                                  <span className="time">{'11:00'}</span>
+                                </li>
+                              );
+                            })}
+                          </ul>
                         )}
                       </div>
                       <MessageInput currentUser={currentUser} sendMessage={sendMessage} userid={userid} />
