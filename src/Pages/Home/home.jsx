@@ -5,6 +5,8 @@ import Chatlist from '../../Components/chatusers/ChatUsers';
 import './home.css';
 import { C } from '../../helper';
 import XApiClient from '../../ApiClient';
+import { Helper } from '../../helper';
+import Moment from 'react-moment';
 
 const Home = ({ userid }) => {
   const getMsg = new XApiClient('https://jd.self.ge');
@@ -100,9 +102,10 @@ const Home = ({ userid }) => {
                               const jsonObject = JSON.parse(message.data);
                               return (
                                 <li key={index} className={'sender'}>
-                                  <p>{jsonObject.message}</p>
-                                  <p>{jsonObject.MASSAGE}</p>
-                                  <span className="time">{'11:00'}</span>
+                                  <p>{Helper.isEmpty(jsonObject.message) ? jsonObject.MASSAGE : jsonObject.message}</p>
+                                  <Moment format="hh:mm:ss" className='time' withTitle>
+                                    { jsonObject.START_DATE }
+                                  </Moment>
                                 </li>
                               );
                             })}

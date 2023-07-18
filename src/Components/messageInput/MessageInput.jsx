@@ -16,6 +16,7 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
     SENDER_PERSON: "",
     CHAT_GROUP_ID: "",
     REPLY_ID: "",
+    START_DATE: '',
   });
   const [showEmoji, setShowEmoji] = useState(false);
 
@@ -56,11 +57,13 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
       return false;
     }
     values.CHAT_GROUP_ID = currentUser[0].GROUP_ID;
-    values.SENDER_PERSON = typeof(C._('userid', userid).ID ) == 'undefined' ? 80353 : C._('userid', userid).ID;
-    // values.SENDER_PERSON = 80353;
+    values.SENDER_PERSON = typeof (C._('userid', userid).ID) == 'undefined' ? 80353 : C._('userid', userid).ID;
+    const date = new Date();
+    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    values.START_DATE = formattedDate;
     SendMsgApi.handleFormSubmit(e,values);
 
-    const message = { msg: e.target[0].value, person: currentUser[0].PERSON_ID };
+    const message = { msg: e.target[0].value, person: currentUser[0].PERSON_ID, START_DATE: values.START_DATE };
     sendMessage(JSON.stringify(message));
     // sendMessage(JSON.stringify(
     //   {
