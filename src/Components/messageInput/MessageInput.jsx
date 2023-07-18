@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import data from "@emoji-mart/data";
 import  Picker  from "@emoji-mart/react";
 import { BiSmile } from "react-icons/bi";
@@ -82,6 +82,18 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
     }
     values.MASSAGE = '';
   };
+
+   useEffect(() => {
+    document.getElementById('msg').addEventListener('input', (e) => {
+      var convertedText = e.target.value
+        .replace(/<3/g, '❤️')
+        .replace(/:D/g, '😀')
+        .replace(/3:\)/g, '😈');
+
+      e.target.value = convertedText;
+    });
+
+  }, []);
 
   function handleChange(e) {
     let key = e.target.className;
