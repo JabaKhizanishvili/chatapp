@@ -12,10 +12,11 @@ const Chatlist = ({ activeUser, userid }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [dataFromChild, setDataFromChild] = useState('');
   const [users, setUsers] = useState([]);
+  let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}`);
+      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
       if (response.ok) {
         const data = await response.json();
         let res = data;
@@ -44,9 +45,9 @@ const Chatlist = ({ activeUser, userid }) => {
     fetchUsers();
   };
 
-  const searchConversations = (e, person_id = '') => {
-    if (person_id !== '') {
-      let url = `https://jd.self.ge/api/Chat/searchConversation?text=&person_id=${person_id}&start=0&limit=${1}`;
+  const searchConversations = (e, group_id = '') => {
+    if (group_id !== '') {
+      let url = `https://jd.self.ge/api/Chat/searchConversation?text=&person_id=${user_id}&group_id=${group_id}&start=0&limit=${1}`;
       fetch(url)
         .then(response => response.json())
         .then(result => {
@@ -66,9 +67,9 @@ const Chatlist = ({ activeUser, userid }) => {
 
     searchConversations.timer = setTimeout(() => {
       const text = e.target.value;
-      let url = `https://jd.self.ge/api/Chat/searchConversation?text=&start=0&limit=${pagination.limit}`;
+      let url = `https://jd.self.ge/api/Chat/searchConversation?text=&start=0&limit=${pagination.limit}&person_id=${user_id}`;
       if (text.length >= 3) {
-        url = `https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&person_id=${person_id}&start=0&limit=${pagination.limit}`;
+        url = `https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&person_id=${user_id}&start=0&limit=${pagination.limit}`;
       }
 
       fetch(url)
@@ -83,7 +84,7 @@ const Chatlist = ({ activeUser, userid }) => {
 
   const fetchData = async (start, limit) => {
     try {
-      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${limit}`);
+      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${limit}&person_id=${user_id}`);
       if (response.ok) {
         const data = await response.json();
         return data;
@@ -119,16 +120,16 @@ const Chatlist = ({ activeUser, userid }) => {
     }));
     fetchMoreData();
     fetchUsers();
-    let userID = localStorage.getItem('jd.self.ge-activeUserId');
-    if ( !Helper.isEmpty(userID)) {
-       searchConversations('', userID )  
+    let group_id = localStorage.getItem('jd.self.ge-activeUserId');
+    if ( !Helper.isEmpty(group_id)) {
+       searchConversations('', group_id )  
     }
 
   }, []);
 
   const handleUserClick = (userId) => {
     localStorage.setItem('jd.self.ge-activeUserId', userId);
-    searchConversations('', localStorage.getItem('jd.self.ge-activeUserId'))
+    searchConversations('',  localStorage.getItem('jd.self.ge-activeUserId'))
   };
 
   return (
@@ -178,7 +179,7 @@ const Chatlist = ({ activeUser, userid }) => {
                         <div
                           key={index}
                           style={{cursor:'pointer'}}
-                          onClick={() => handleUserClick(user.PERSON_ID)}
+                          onClick={() => handleUserClick(user.CONVERSATION_ID)}
                           className="d-flex align-items-center mt-4 pb-2 mb-12 cursor-auto"
                         >
                           <div className="flex-shrink-0">

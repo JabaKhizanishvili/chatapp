@@ -28,7 +28,7 @@ const Home = ({ userid }) => {
     const fetchMessageHistory = async () => {
       try {
         setIsLoading(true); // Set loading status to true before API call
-        const response = await fetch(`https://jd.self.ge/api/Chat/getMsg?group_id=${currentUser[0].GROUP_ID}`);
+        const response = await fetch(`https://jd.self.ge/api/Chat/getMsg?group_id=${currentUser[0].CONVERSATION_ID}`);
         const result = await response.json();
         setMessageHistory(result.data.map(element => ({
           data: JSON.stringify(element)
@@ -51,9 +51,11 @@ const Home = ({ userid }) => {
 
   useEffect(() => {
     if (lastMessage !== null) {
-      // if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {        
-        setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
-      // }
+      if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {      
+        if (currentUser[0].CONVERSATION_ID == JSON.parse(lastMessage.data).CHAT_GROUP_ID) {
+           setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
+        }
+      }
     }
   }, [lastMessage]);
 
@@ -64,6 +66,7 @@ const Home = ({ userid }) => {
     [ReadyState.CLOSED]: 'Closed',
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
+
 
   return (
     <div className="container">
@@ -104,8 +107,6 @@ const Home = ({ userid }) => {
                               let chatType;
 
                               if (jsonObject.SENDER_PERSON == user_id) {
-                                console.log(user_id);
-                                console.log(jsonObject.SENDER_PERSON);
                                 chatType = 'sender'
                               } else {
                                 chatType = 'repaly'

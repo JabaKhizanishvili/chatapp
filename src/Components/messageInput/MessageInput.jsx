@@ -57,11 +57,12 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
     if (e.target[0].value === "") {
       return false;
     }
-    values.CHAT_GROUP_ID = currentUser[0].GROUP_ID;
+    values.CHAT_GROUP_ID = currentUser[0].CONVERSATION_ID*1;
     values.SENDER_PERSON = user_id;
     const date = new Date();
     const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
     values.START_DATE = formattedDate;
+
     SendMsgApi.handleFormSubmit(e,values);
 
     const message = {
@@ -69,6 +70,7 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
       person: currentUser[0].PERSON_ID,
       START_DATE: values.START_DATE,
       SENDER_PERSON: user_id,
+      CHAT_GROUP_ID: values.CHAT_GROUP_ID,
     };
     sendMessage(JSON.stringify(message));
     // sendMessage(JSON.stringify(
