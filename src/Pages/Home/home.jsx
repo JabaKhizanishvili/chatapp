@@ -51,9 +51,9 @@ const Home = ({ userid }) => {
 
   useEffect(() => {
     if (lastMessage !== null) {
-      if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {        
+      // if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {        
         setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
-      }
+      // }
     }
   }, [lastMessage]);
 
@@ -104,7 +104,8 @@ const Home = ({ userid }) => {
                               let chatType;
 
                               if (jsonObject.SENDER_PERSON == user_id) {
-                                console.log( user_id );
+                                console.log(user_id);
+                                console.log(jsonObject.SENDER_PERSON);
                                 chatType = 'sender'
                               } else {
                                 chatType = 'repaly'

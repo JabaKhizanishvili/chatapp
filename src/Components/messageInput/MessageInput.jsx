@@ -68,7 +68,7 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
       msg: e.target[0].value,
       person: currentUser[0].PERSON_ID,
       START_DATE: values.START_DATE,
-      userid: user_id,
+      SENDER_PERSON: user_id,
     };
     sendMessage(JSON.stringify(message));
     // sendMessage(JSON.stringify(
