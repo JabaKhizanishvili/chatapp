@@ -7,6 +7,7 @@ import { C } from '../../helper';
 import XApiClient from '../../ApiClient';
 import { Helper } from '../../helper';
 import Moment from 'react-moment';
+import { json } from 'react-router-dom';
 
 const Home = ({ userid }) => {
   const getMsg = new XApiClient('https://jd.self.ge');
@@ -100,8 +101,16 @@ const Home = ({ userid }) => {
                           <ul>
                             {messageHistory.map((message, index) => {
                               const jsonObject = JSON.parse(message.data);
+                              let chatType;
+
+                              if (jsonObject.SENDER_PERSON == user_id) {
+                                console.log( user_id );
+                                chatType = 'sender'
+                              } else {
+                                chatType = 'repaly'
+                              }
                               return (
-                                <li key={index} className={'sender'}>
+                                <li key={index} className={chatType}>
                                   <p>{Helper.isEmpty(jsonObject.message) ? jsonObject.MASSAGE : jsonObject.message}</p>
                                   <Moment format="hh:mm:ss" className='time' withTitle>
                                     { jsonObject.START_DATE }
