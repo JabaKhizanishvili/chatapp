@@ -51,11 +51,11 @@ const Home = ({ userid }) => {
 
   useEffect(() => {
     if (lastMessage !== null) {
-      if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {      
+      // if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {      
         if (currentUser[0].CONVERSATION_ID == JSON.parse(lastMessage.data).CHAT_GROUP_ID) {
            setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
         }
-      }
+      // }
     }
   }, [lastMessage]);
 

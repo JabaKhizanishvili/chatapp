@@ -1,28 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { BsPersonCircle } from 'react-icons/bs';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import CreateConversation from '../createConversation/createConvesation';
 import { Helper, C } from '../../helper';
 
 const Chatlist = ({ activeUser, userid }) => {
   const location = useLocation();
   const [modal, setModal] = useState(false);
-  const [pagination, setPagination] = useState({ start: 0, limit: 12, count: false, pages: false, userData: [] });
+  const [pagination, setPagination] = useState({
+    start: 0,
+    limit: 12,
+    count: false,
+    pages: false,
+    userData: []
+  });
   const [currentPage, setCurrentPage] = useState(0);
   const [dataFromChild, setDataFromChild] = useState('');
   const [users, setUsers] = useState([]);
-  let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
+  const user_id = C._('userid', userid)?.ID || 212;
 
   const fetchUsers = async () => {
     try {
       const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
       if (response.ok) {
         const data = await response.json();
-        let res = data;
+        const res = data;
         setUsers(res.data);
-        let countdata = res.count[0]['COUNT(*)'] * 1;
-        let pages = Math.ceil(countdata / pagination.limit);
+        const countdata = Number(res.count[0]['COUNT(*)']);
+        const pages = Math.ceil(countdata / pagination.limit);
         setPagination(values => ({
           ...values,
           count: countdata,
@@ -47,7 +53,7 @@ const Chatlist = ({ activeUser, userid }) => {
 
   const searchConversations = (e, group_id = '') => {
     if (group_id !== '') {
-      let url = `https://jd.self.ge/api/Chat/searchConversation?text=&person_id=${user_id}&group_id=${group_id}&start=0&limit=${1}`;
+      const url = `https://jd.self.ge/api/Chat/searchConversation?text=&person_id=${user_id}&group_id=${group_id}&start=0&limit=${1}`;
       fetch(url)
         .then(response => response.json())
         .then(result => {
@@ -57,7 +63,6 @@ const Chatlist = ({ activeUser, userid }) => {
             userData: res.data,
           }));
           activeUser(res.data);
-          return false;
         })
         .catch(error => console.log('error', error));
       return false;
@@ -69,7 +74,7 @@ const Chatlist = ({ activeUser, userid }) => {
       const text = e.target.value;
       let url = `https://jd.self.ge/api/Chat/searchConversation?text=&start=0&limit=${pagination.limit}&person_id=${user_id}`;
       if (text.length >= 3) {
-        url = `https://jd.self.ge/api/Chat/searchConversation?text=${e.target.value}&person_id=${user_id}&start=0&limit=${pagination.limit}`;
+        url = `https://jd.self.ge/api/Chat/searchConversation?text=${text}&person_id=${user_id}&start=0&limit=${pagination.limit}`;
       }
 
       fetch(url)
@@ -120,16 +125,16 @@ const Chatlist = ({ activeUser, userid }) => {
     }));
     fetchMoreData();
     fetchUsers();
-    let group_id = localStorage.getItem('jd.self.ge-activeUserId');
-    if ( !Helper.isEmpty(group_id)) {
-       searchConversations('', group_id )  
+    const group_id = localStorage.getItem('jd.self.ge-activeUserId');
+    if (!Helper.isEmpty(group_id)) {
+      searchConversations('', group_id);
     }
 
   }, []);
 
   const handleUserClick = (userId) => {
     localStorage.setItem('jd.self.ge-activeUserId', userId);
-    searchConversations('',  localStorage.getItem('jd.self.ge-activeUserId'))
+    searchConversations('', localStorage.getItem('jd.self.ge-activeUserId'));
   };
 
   return (
@@ -178,7 +183,7 @@ const Chatlist = ({ activeUser, userid }) => {
                       {users.map((user, index) => (
                         <div
                           key={index}
-                          style={{cursor:'pointer'}}
+                          style={{ cursor: 'pointer' }}
                           onClick={() => handleUserClick(user.CONVERSATION_ID)}
                           className="d-flex align-items-center mt-4 pb-2 mb-12 cursor-auto"
                         >
@@ -186,9 +191,7 @@ const Chatlist = ({ activeUser, userid }) => {
                             <BsPersonCircle />
                             {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
                           </div>
-                          <div className="flex-grow-1 ms-3
-
-">
+                          <div className="flex-grow-1 ms-3">
                             <h6>{user.TEXT}</h6>
                           </div>
                         </div>
