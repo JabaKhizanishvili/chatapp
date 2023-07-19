@@ -390,12 +390,17 @@ a.add img {
 }
 
 .msg-body{
-  height: 100vh;
-  overflow-y: scroll;
+    width: auto;
+    height: 100vh;
+    overflow-x: hidden !important;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
-.msg-body ul {
-  overflow: hidden;
+
+.infinite-scroll-component{
+  overflow-x: hidden !important;
 }
 
 .msg-body ul li {
