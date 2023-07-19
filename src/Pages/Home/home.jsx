@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import MessageInput from '../../Components/messageInput/MessageInput';
 import Chatlist from '../../Components/chatusers/ChatUsers';
@@ -8,6 +8,18 @@ import XApiClient from '../../ApiClient';
 import { Helper } from '../../helper';
 import Moment from 'react-moment';
 import { json } from 'react-router-dom';
+
+ const scrollBottom = () => {
+    let msgbody = document.querySelector(".msg-body");
+    if (msgbody != null) {
+      setTimeout(function () {
+        msgbody.scrollTo({
+          top: document.querySelector(".msg-body ul").scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  }
 
 const Home = ({ userid }) => {
   const getMsg = new XApiClient('https://jd.self.ge');
@@ -53,7 +65,8 @@ const Home = ({ userid }) => {
     if (lastMessage !== null) {
       // if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {      
         if (currentUser[0].CONVERSATION_ID == JSON.parse(lastMessage.data).CHAT_GROUP_ID) {
-           setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
+          setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
+          scrollBottom();
         }
       // }
     }

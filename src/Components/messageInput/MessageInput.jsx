@@ -6,6 +6,18 @@ import { TiDelete } from "react-icons/ti";
 import XApiClient from '../../ApiClient';
 import { C } from '../../helper';
 
+ export const scrollBottom = () => {
+    let msgbody = document.querySelector(".msg-body");
+    if (msgbody != null) {
+      setTimeout(function () {
+        msgbody.scrollTo({
+          top: document.querySelector(".msg-body ul").scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  }
+
 const MessageInput = ({ currentUser, sendMessage, userid }) => {
   const SendMsgApi = new XApiClient('https://jd.self.ge');
 
@@ -79,15 +91,7 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
     //     person: currentUser.ID
     //   }));
     
-    let msgbody = document.querySelector(".msg-body");
-    if (msgbody != null) {
-      setTimeout(function () {
-        msgbody.scrollTo({
-          top: document.querySelector(".msg-body ul").scrollHeight,
-          behavior: "smooth",
-        });
-      }, 100);
-    }
+    scrollBottom();
     values.MASSAGE = '';
   };
 

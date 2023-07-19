@@ -20,27 +20,34 @@ const Chatlist = ({ activeUser, userid }) => {
   const [users, setUsers] = useState([]);
   const user_id = C._('userid', userid)?.ID || 212;
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
-      if (response.ok) {
-        const data = await response.json();
-        const res = data;
-        setUsers(res.data);
-        const countdata = Number(res.count[0]['COUNT(*)']);
-        const pages = Math.ceil(countdata / pagination.limit);
-        setPagination(values => ({
-          ...values,
-          count: countdata,
-          pages: pages
-        }));
-      } else {
-        throw new Error('Error: ' + response.status);
-      }
-    } catch (error) {
-      console.error('Request failed:', error);
+const fetchUsers = async () => {
+  try {
+    const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
+    if (response.ok) {
+      const data = await response.json();
+      const res = data;
+      setUsers(prevUsers => {
+        if (prevUsers.length > 0) {
+          return res.data;
+        } else {
+          return [...prevUsers, ...res.data];
+        }
+      });
+      const countdata = Number(res.count[0]['COUNT(*)']);
+      const pages = Math.ceil(countdata / pagination.limit);
+      setPagination(values => ({
+        ...values,
+        count: countdata,
+        pages: pages
+      }));
+    } else {
+      throw new Error('Error: ' + response.status);
     }
-  };
+  } catch (error) {
+    console.error('Request failed:', error);
+  }
+};
+
 
   const handleDataFromChild = (data) => {
     setDataFromChild(data);
@@ -195,7 +202,9 @@ const Chatlist = ({ activeUser, userid }) => {
                             <h6>{ user.PERSON_ID == user_id ? user.TEXT : user.CREATORNAME}</h6>
                           </div>
                         </div>
-                      ))}
+                         )
+                       )
+                       }
                     </InfiniteScroll>
                   </div>
                 </div>
