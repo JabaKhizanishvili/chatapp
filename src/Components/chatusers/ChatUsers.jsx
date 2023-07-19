@@ -192,7 +192,7 @@ const Chatlist = ({ activeUser, userid }) => {
                             {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
                           </div>
                           <div className="flex-grow-1 ms-3">
-                            <h6>{ user.PERSON_ID == user_id ? user.TEXT : user.FULLNAME}</h6>
+                            <h6>{ user.PERSON_ID == user_id ? user.TEXT : user.CREATORNAME}</h6>
                           </div>
                         </div>
                       ))}
