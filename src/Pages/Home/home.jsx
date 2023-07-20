@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useContext } from 'react';
+import React, { useState, useCallback, useEffect, useContext,useRef } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import MessageInput from '../../Components/messageInput/MessageInput';
 import Chatlist from '../../Components/chatusers/ChatUsers';
@@ -8,22 +8,10 @@ import XApiClient from '../../ApiClient';
 import { Helper } from '../../helper';
 import Moment from 'react-moment';
 import { json } from 'react-router-dom';
-import { current } from 'tst';
 
- const scrollBottom = () => {
-    let msgbody = document.querySelector(".msg-body");
-    if (msgbody != null) {
-      setTimeout(function () {
-        msgbody.scrollTo({
-          top: document.querySelector(".msg-body ul").scrollHeight,
-          behavior: "smooth",
-        });
-      }, 100);
-    }
-  }
 
 const Home = ({ userid }) => {
-
+  const [userScrolledUp, setUserScrolledUp] = useState(0);
   const getMsg = new XApiClient('https://jd.self.ge');
   const [currentUser, setCurrentUser] = useState([]);
   let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
@@ -33,7 +21,6 @@ const Home = ({ userid }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [maxPage, setMaxPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true); // New state for loading status
-
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   const activeUser = useCallback((data) => {
     setCurrentUser(data);
@@ -41,7 +28,24 @@ const Home = ({ userid }) => {
   }, []);
 
 
-    
+    const scrollBottom = (toLocation = '') => {
+  // if (toLocation != '') {
+  // }
+  console.log(userScrolledUp);
+    let msgbody = document.querySelector(".msg-body");
+      if (msgbody != null) {
+        var ul = document.querySelector(".msg-body ul")
+        if (ul == null) {
+          return false;
+        }
+      setTimeout(function () {
+        msgbody.scrollTo({
+          top: document.querySelector(".msg-body ul").scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  }
 
   useEffect(() => {
 
@@ -50,9 +54,9 @@ const Home = ({ userid }) => {
         setIsLoading(true); // Set loading status to true before API call
         const response = await fetch(`https://jd.self.ge/api/Chat/getMsg?group_id=${currentUser[0].CONVERSATION_ID}&page=${currentPage}`);
         const result = await response.json();
-        const newMessages = result.data.map(element => ({ data: JSON.stringify(element) }));
+        const newMessages = result.data.map(element => ({ data: JSON.stringify(element) })).reverse();
         setMaxPage(result.pages)
-        setMessageHistory(prev => currentPage === 1 ? newMessages : [...prev, ...newMessages]);
+        setMessageHistory(prev => currentPage === 1 ? newMessages : [...newMessages, ...prev]);
       } catch (error) {
         console.log('error', error);
       } finally {
@@ -67,21 +71,19 @@ const Home = ({ userid }) => {
     // ...
   }, [currentUser, currentPage]); // Include currentPage as a dependency
 
-
-
-   useEffect(() => {
-
-     const handleScroll = (e) => {
+   const handleScroll = (e) => {
        if (currentPage >= maxPage) {
          return false;
        }
-      const container = e.target;
-      const isAtBottom = container.clientHeight + Math.abs(container.scrollTop) + 1 >= container.scrollHeight;
+     const container = e.target;
+       const isAtBottom = container.clientHeight + Math.abs(container.scrollTop) + 1 >= container.scrollHeight;
+     setUserScrolledUp(container.clientHeight);
       if (isAtBottom) {
-        setCurrentPage(prevPage => prevPage + 1);
-      }
-    };
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+   };
 
+  useEffect(() => {
     const container = document.querySelector('.msg-body');
      container.addEventListener('scroll', handleScroll);
      
@@ -91,12 +93,17 @@ const Home = ({ userid }) => {
 
   }, [isLoading,currentPage, maxPage]);
 
+
   useEffect(() => {
     if (lastMessage !== null) {
       // if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {      
         if (currentUser[0].CONVERSATION_ID == JSON.parse(lastMessage.data).CHAT_GROUP_ID) {
           setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
-          scrollBottom();
+          let msgbody = document.querySelector('.msg-body');
+          const isAtBottom = msgbody.clientHeight + msgbody.scrollTop + 1 >= msgbody.scrollHeight;
+           if (msgbody) {
+             }
+          // scrollBottom();
         }
       // }
     }
@@ -144,7 +151,7 @@ const Home = ({ userid }) => {
                         {isLoading ? ( // Display preloader while loading
                           <div>Loading...</div>
                         ) : (
-                          <ul>
+                          <ul className={'msg-body-ul'}>
                             {messageHistory.map((message, index) => {
                               const jsonObject = JSON.parse(message.data);
                               let chatType;
@@ -163,6 +170,7 @@ const Home = ({ userid }) => {
                                 </li>
                               );
                             })}
+                              <div className='scrollbtm'></div>
                           </ul>
                         )}
                       </div>
