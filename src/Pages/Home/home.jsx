@@ -8,6 +8,7 @@ import XApiClient from '../../ApiClient';
 import { Helper } from '../../helper';
 import Moment from 'react-moment';
 import { json } from 'react-router-dom';
+import { current } from 'tst';
 
  const scrollBottom = () => {
     let msgbody = document.querySelector(".msg-body");
@@ -22,12 +23,15 @@ import { json } from 'react-router-dom';
   }
 
 const Home = ({ userid }) => {
+
   const getMsg = new XApiClient('https://jd.self.ge');
   const [currentUser, setCurrentUser] = useState([]);
   let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
   const url = 'wss://jd.self.ge:8080/chat?id=' + user_id;
   const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true); // New state for loading status
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
@@ -36,15 +40,19 @@ const Home = ({ userid }) => {
     setIsLoading(true); // Set loading status to true when user changes
   }, []);
 
+
+    
+
   useEffect(() => {
+
     const fetchMessageHistory = async () => {
       try {
         setIsLoading(true); // Set loading status to true before API call
-        const response = await fetch(`https://jd.self.ge/api/Chat/getMsg?group_id=${currentUser[0].CONVERSATION_ID}`);
+        const response = await fetch(`https://jd.self.ge/api/Chat/getMsg?group_id=${currentUser[0].CONVERSATION_ID}&page=${currentPage}`);
         const result = await response.json();
-        setMessageHistory(result.data.map(element => ({
-          data: JSON.stringify(element)
-        })));
+        const newMessages = result.data.map(element => ({ data: JSON.stringify(element) }));
+        setMaxPage(result.pages)
+        setMessageHistory(prev => currentPage === 1 ? newMessages : [...prev, ...newMessages]);
       } catch (error) {
         console.log('error', error);
       } finally {
@@ -56,10 +64,32 @@ const Home = ({ userid }) => {
       fetchMessageHistory();
     }
 
-    return () => {
-      // Cleanup code here
+    // ...
+  }, [currentUser, currentPage]); // Include currentPage as a dependency
+
+
+
+   useEffect(() => {
+
+     const handleScroll = (e) => {
+       if (currentPage >= maxPage) {
+         return false;
+       }
+      const container = e.target;
+      const isAtBottom = container.clientHeight + Math.abs(container.scrollTop) + 1 >= container.scrollHeight;
+      if (isAtBottom) {
+        setCurrentPage(prevPage => prevPage + 1);
+      }
     };
-  }, [currentUser]);
+
+    const container = document.querySelector('.msg-body');
+     container.addEventListener('scroll', handleScroll);
+     
+     return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+
+  }, [isLoading,currentPage, maxPage]);
 
   useEffect(() => {
     if (lastMessage !== null) {
