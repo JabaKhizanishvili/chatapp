@@ -7,15 +7,15 @@ import XApiClient from '../../ApiClient';
 import { C } from '../../helper';
 
  export const scrollBottom = () => {
-    let msgbody = document.querySelector(".msg-body");
-    if (msgbody != null) {
-      setTimeout(function () {
-        msgbody.scrollTo({
-          top: document.querySelector(".msg-body ul").scrollHeight,
-          behavior: "smooth",
-        });
-      }, 100);
-    }
+    // let msgbody = document.querySelector(".msg-body");
+    // if (msgbody != null) {
+    //   setTimeout(function () {
+    //     msgbody.scrollTo({
+    //       top: document.querySelector(".msg-body ul").scrollHeight,
+    //       behavior: "smooth",
+    //     });
+    //   }, 100);
+    // }
   }
 
 const MessageInput = ({ currentUser, sendMessage, userid }) => {

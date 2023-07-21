@@ -1,13 +1,11 @@
-import React, { useState, useCallback, useEffect, useContext,useRef } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
-import MessageInput from '../../Components/messageInput/MessageInput';
-import Chatlist from '../../Components/chatusers/ChatUsers';
-import './home.css';
-import { C } from '../../helper';
-import XApiClient from '../../ApiClient';
-import { Helper } from '../../helper';
+import React, { useCallback, useEffect, useState } from 'react';
 import Moment from 'react-moment';
-import { json } from 'react-router-dom';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import XApiClient from '../../ApiClient';
+import Chatlist from '../../Components/chatusers/ChatUsers';
+import MessageInput from '../../Components/messageInput/MessageInput';
+import { C, Helper } from '../../helper';
+import './home.css';
 
 
 const Home = ({ userid }) => {
@@ -20,6 +18,7 @@ const Home = ({ userid }) => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [maxPage, setMaxPage] = useState(0);
+  const [onlineusers, setOnlineUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // New state for loading status
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   const activeUser = useCallback((data) => {
@@ -31,7 +30,6 @@ const Home = ({ userid }) => {
     const scrollBottom = (toLocation = '') => {
   // if (toLocation != '') {
   // }
-  console.log(userScrolledUp);
     let msgbody = document.querySelector(".msg-body");
       if (msgbody != null) {
         var ul = document.querySelector(".msg-body ul")
@@ -65,6 +63,10 @@ const Home = ({ userid }) => {
     };
 
     if (currentUser.length > 0) {
+        const cmd = {
+         cmd: 'isonline',
+        };
+      sendMessage(JSON.stringify(cmd));
       fetchMessageHistory();
     }
 
@@ -94,8 +96,13 @@ const Home = ({ userid }) => {
   }, [isLoading,currentPage, maxPage]);
 
 
-  useEffect(() => {
+  useEffect(() => {    
     if (lastMessage !== null) {
+     let parsedData = JSON.parse(lastMessage.data);
+      if (typeof (parsedData.type) != 'undefined' && parsedData.type == 'isonline') {
+        setOnlineUsers(parsedData.activeusers);        
+      }
+
       // if (currentUser[0].PERSON_ID == JSON.parse(lastMessage.data).person) {      
         if (currentUser[0].CONVERSATION_ID == JSON.parse(lastMessage.data).CHAT_GROUP_ID) {
           setMessageHistory(prev => [...prev, { data: lastMessage.data }]);
@@ -125,7 +132,7 @@ const Home = ({ userid }) => {
           <div className="row">
             <div className="col-12">
               <div className="chat-area">
-                <Chatlist activeUser={activeUser} userid={userid} />
+                <Chatlist activeUser={activeUser} onlineusers={onlineusers} userid={userid} />
 
                 <div className="chatbox">
                   <div className="modal-dialog-scrollable">

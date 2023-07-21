@@ -109,6 +109,7 @@ section {
 
 body {
   line-height: 1.5;
+  overflow-y: hidden;
 }
 
 ol,
@@ -116,23 +117,10 @@ ul {
   list-style: none;
 }
 
-blockquote,
+/* blockquote,
 q {
   quotes: none;
-}
-
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: "";
-  content: none;
-}
-
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
+} */
 
 /********************************
  Typography Style
@@ -207,12 +195,12 @@ message-area
   padding: 15px;
 }
 
-.chat-area .modal-content {
+/* .chat-area .modal-content {
   border: none;
   border-radius: 0;
   outline: 0;
   height: 100%;
-}
+} */
 
 .chat-area .modal-dialog-scrollable {
   height: 100% !important;
@@ -237,7 +225,7 @@ message-area
   justify-content: space-between;
 }
 
-.chat-area .form-control {
+/* .chat-area .form-control {
   display: block;
   width: 80%;
   padding: 0.375rem 0.75rem;
@@ -253,7 +241,7 @@ message-area
   appearance: none;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
+} */
 
 .chat-area .form-control:focus {
   outline: 0;
@@ -394,27 +382,38 @@ a.add img {
     height: 100vh;
     overflow-x: hidden !important;
     overflow-y: scroll;
-    /* display: flex; */
-    /* flex-direction: column-reverse; */
+    display: flex;
+    flex-direction: column-reverse;
 }
+
+
+/* .chat{
+  padding: 20px;
+      width: auto;
+      height: 58vh;
+      overflow-x: hidden !important;
+      overflow-y: scroll;
+      display: flex;
+      flex-direction: column-reverse;
+} */
 
 
 .infinite-scroll-component{
   overflow-x: hidden !important;
 }
 
-.msg-body ul li {
+.msg-body-ul li {
   list-style: none;
   margin: 15px 0;
 }
 
-.msg-body ul li.sender {
+.msg-body-ul li.sender {
   display: block;
   width: 100%;
   position: relative;
 }
 
-.msg-body ul li.sender:before {
+.msg-body-ul li.sender:before {
   display: block;
   clear: both;
   content: "";
@@ -431,7 +430,7 @@ a.add img {
   transform: rotate(-37deg);
 }
 
-.msg-body ul li.sender p {
+.msg-body-ul li.sender p {
   color: #000;
   font-size: 14px;
   line-height: 1.5;
@@ -445,7 +444,7 @@ a.add img {
   margin-bottom: 0;
 }
 
-.msg-body ul li.sender p b {
+.msg-body-ul li.sender p b {
   display: block;
   color: #180660;
   font-size: 14px;
@@ -453,14 +452,14 @@ a.add img {
   font-weight: 500;
 }
 
-.msg-body ul li.repaly {
+.msg-body-ul li.repaly {
   display: block;
   width: 100%;
   text-align: right;
   position: relative;
 }
 
-.msg-body ul li.repaly:before {
+.msg-body-ul li.repaly:before {
   display: block;
   clear: both;
   content: "";
@@ -477,7 +476,7 @@ a.add img {
   transform: rotate(37deg);
 }
 
-.msg-body ul li.repaly p {
+.msg-body-ul li.repaly p {
   color: #fff;
   font-size: 14px;
   line-height: 1.5;
@@ -491,7 +490,7 @@ a.add img {
   margin-bottom: 0;
 }
 
-.msg-body ul li.repaly p b {
+.msg-body-ul li.repaly p b {
   display: block;
   color: #061061;
   font-size: 14px;
@@ -499,7 +498,7 @@ a.add img {
   font-weight: 500;
 }
 
-.msg-body ul li.repaly:after {
+.msg-body-ul li.repaly:after {
   display: block;
   content: "";
   clear: both;

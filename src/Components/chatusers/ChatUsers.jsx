@@ -5,8 +5,9 @@ import { useLocation } from 'react-router-dom';
 import CreateConversation from '../createConversation/createConvesation';
 import { Helper, C } from '../../helper';
 
-const Chatlist = ({ activeUser, userid }) => {
+const Chatlist = ({ activeUser, userid, onlineusers }) => {
   const location = useLocation();
+  let onlineUsers = Object.values(onlineusers);
   const [modal, setModal] = useState(false);
   const [pagination, setPagination] = useState({
     start: 0,
@@ -22,7 +23,8 @@ const Chatlist = ({ activeUser, userid }) => {
 
 const fetchUsers = async () => {
   try {
-    const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
+    // const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
+     const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&creator_id=${user_id}`);
     if (response.ok) {
       const data = await response.json();
       const res = data;
@@ -60,7 +62,7 @@ const fetchUsers = async () => {
 
   const searchConversations = (e, group_id = '') => {
     if (group_id !== '') {
-      const url = `https://jd.self.ge/api/Chat/searchConversation?text=&person_id=${user_id}&group_id=${group_id}&start=0&limit=${1}`;
+      const url = `https://jd.self.ge/api/Chat/searchConversation?text=&group_id=${group_id}&start=0&limit=${1}`;
       fetch(url)
         .then(response => response.json())
         .then(result => {
@@ -96,7 +98,7 @@ const fetchUsers = async () => {
 
   const fetchData = async (start, limit) => {
     try {
-      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${limit}&person_id=${user_id}`);
+      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${limit}&creator_id=${user_id}`);
       if (response.ok) {
         const data = await response.json();
         return data;
@@ -187,23 +189,31 @@ const fetchUsers = async () => {
                       loader={<h4>Loading...</h4>}
                       scrollableTarget="scrollableDiv"
                     >
-                      {users.map((user, index) => (
-                        <div
+
+                      {
+                        users.map((user, index) => {
+                          return (
+                              <div
                           key={index}
                           style={{ cursor: 'pointer' }}
                           onClick={() => handleUserClick(user.CONVERSATION_ID)}
                           className="d-flex align-items-center mt-4 pb-2 mb-12 cursor-auto"
                         >
-                          <div className="flex-shrink-0">
-                            <BsPersonCircle />
+                              <div className="flex-shrink-0">
+                                {
+                                  onlineUsers.includes(user.PERSON_ID.toString()) ? 
+                                    <BsPersonCircle style={{backgroundColor: 'green', borderRadius: '50%'}} />
+                                    : 
+                                    <BsPersonCircle />
+                                }
                             {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
                           </div>
                           <div className="flex-grow-1 ms-3">
                             <h6>{ user.PERSON_ID == user_id && user_id != user.CREATOR_ID ? user.CREATORNAME : user.TEXT}</h6>
                           </div>
                         </div>
-                         )
-                       )
+                          )
+                        })
                        }
                     </InfiniteScroll>
                   </div>
