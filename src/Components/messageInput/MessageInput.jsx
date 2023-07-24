@@ -22,6 +22,8 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
   const SendMsgApi = new XApiClient('https://jd.self.ge');
 
   let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
+  // let user_id = 4774
+
   const [img, setImg] = useState("");
   const [clipimg, setClipimg] = useState([]);
   const [values, setValues] = useState({
@@ -74,9 +76,7 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
     const date = new Date();
     const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
     values.START_DATE = formattedDate;
-
     SendMsgApi.handleFormSubmit(e,values);
-
     const message = {
       msg: e.target[0].value,
       person: currentUser[0].PERSON_ID,

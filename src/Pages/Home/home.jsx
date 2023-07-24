@@ -133,7 +133,7 @@ const Home = ({ userid }) => {
           <div className="row">
             <div className="col-12">
               <div className="chat-area">
-                <Chatlist activeUser={activeUser} onlineusers={onlineusers} userid={userid} />
+                <Chatlist activeUser={activeUser} lastMessage={lastMessage} onlineusers={onlineusers} userid={userid} />
 
                 <div className="chatbox">
                   <div className="modal-dialog-scrollable">
