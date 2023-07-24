@@ -13,6 +13,7 @@ const Home = ({ userid }) => {
   const getMsg = new XApiClient('https://jd.self.ge');
   const [currentUser, setCurrentUser] = useState([]);
   let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
+  // let user_id = 4774;
   const url = 'wss://jd.self.ge:8080/chat?id=' + user_id;
   const [socketUrl, setSocketUrl] = useState(url);
   const [messageHistory, setMessageHistory] = useState([]);

@@ -20,11 +20,12 @@ const Chatlist = ({ activeUser, userid, onlineusers }) => {
   const [dataFromChild, setDataFromChild] = useState('');
   const [users, setUsers] = useState([]);
   const user_id = C._('userid', userid)?.ID || 212;
+  // let user_id = 4774;
 
 const fetchUsers = async () => {
   try {
-    // const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
-     const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&creator_id=${user_id}`);
+    const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}&creator_id=${user_id}`);
+    //  const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&creator_id=${user_id}`);
     if (response.ok) {
       const data = await response.json();
       const res = data;
