@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { BsPersonCircle } from 'react-icons/bs';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useLocation } from 'react-router-dom';
+import { C, Helper } from '../../helper';
 import CreateConversation from '../createConversation/createConvesation';
-import { Helper, C } from '../../helper';
 
 const Chatlist = ({ activeUser, userid, onlineusers, lastMessage }) => {
   const location = useLocation();
@@ -151,21 +151,17 @@ const fetchUsers = async () => {
   useEffect(() => {
      if (lastMessage != null) {
     if (typeof (JSON.parse(lastMessage.data).CHAT_GROUP_ID) != 'undefined') {
-
       const index = users.findIndex(e => e.CONVERSATION_ID == JSON.parse(lastMessage.data).CHAT_GROUP_ID);
       if (index !== -1) {
         const updatedUsers = [...users];
         updatedUsers[index].MESSAGE_COUNT++;
-        setUsers(updatedUsers);
+        // setUsers(updatedUsers);
       }
     }
   }
 
-   } , [lastMessage])
-
-
-
-
+  }, [lastMessage])
+  
   return (
     <>
       <div className="chatlist">
@@ -233,7 +229,7 @@ const fetchUsers = async () => {
                             <h6>{ user.PERSON_ID == user_id && user_id != user.CREATOR_ID ? user.CREATORNAME : user.TEXT}</h6>
                               </div>
                               {
-                                user.MESSAGE_COUNT * 1 > 0 &&
+                                user.MESSAGE_COUNT * 1 > 0 && user.PERSON_ID == user_id &&
                                 <span className="bg-info" style={{borderRadius: '50%'}}> { user.MESSAGE_COUNT } </span>
                               }
                         </div>

@@ -63,7 +63,7 @@ const About = () => {
           next={() => {
             console.log('asd');
             setCurrentPage(prev => prev + 1)
-            console.log(currentPage);
+            // console.log(currentPage);
           }}
     style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
     inverse={true} //

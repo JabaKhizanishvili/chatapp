@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import data from "@emoji-mart/data";
 import  Picker  from "@emoji-mart/react";
 import { BiSmile } from "react-icons/bi";
 import { TiDelete } from "react-icons/ti";
 import XApiClient from '../../ApiClient';
+import {useDropzone} from 'react-dropzone'
 import { C } from '../../helper';
 
  export const scrollBottom = () => {
@@ -19,6 +20,15 @@ import { C } from '../../helper';
   }
 
 const MessageInput = ({ currentUser, sendMessage, userid }) => {
+const {acceptedFiles, getRootProps, getInputProps, inputRef} = useDropzone();
+
+  const files = acceptedFiles.map(file => (
+    <li key={file.path}>
+      {file.path} - {file.size} bytes
+    </li>
+  ));
+
+  
   const SendMsgApi = new XApiClient('https://jd.self.ge');
 
   let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
@@ -32,6 +42,7 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
     CHAT_GROUP_ID: "",
     REPLY_ID: "",
     START_DATE: '',
+    FILE: '',
   });
   const [showEmoji, setShowEmoji] = useState(false);
 
@@ -68,21 +79,39 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
 
   const submitMsg = (e) => {
     e.preventDefault();
-    if (e.target[0].value === "") {
+    if ( e.target[0].value === "" && acceptedFiles.length <= 0 ) {
       return false;
     }
+
+
+    let Files = acceptedFiles.map((e, i) => {
+      return {
+        path: e.path,
+        name: e.name,
+        size: e.size,
+        type: e.type,
+      }
+    })
     values.CHAT_GROUP_ID = currentUser[0].CONVERSATION_ID*1;
     values.SENDER_PERSON = user_id;
+    values.FILE = JSON.stringify(Files);
     const date = new Date();
     const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
     values.START_DATE = formattedDate;
-    SendMsgApi.handleFormSubmit(e,values);
+
+    SendMsgApi.handleFormSubmit(e, values);
+    
+    acceptedFiles.length = 0
+    acceptedFiles.splice(0, acceptedFiles.length)
+    inputRef.current.value = ''
+
     const message = {
       msg: e.target[0].value,
       person: currentUser[0].PERSON_ID,
       START_DATE: values.START_DATE,
       SENDER_PERSON: user_id,
       CHAT_GROUP_ID: values.CHAT_GROUP_ID,
+      FILES: JSON.stringify(Files),
     };
     sendMessage(JSON.stringify(message));
     // sendMessage(JSON.stringify(
@@ -146,9 +175,17 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
           </button>
         </form>
 
-        <div className="send-btns">
-          <div className="attach">
-            <div className="button-wrapper">
+          <div className="attach row row-cols-2">
+            
+              {/* <input
+                type="file"
+                name="upload"
+                id="upload"
+                className="upload-box"
+                placeholder="Upload File"
+                aria-label="Upload File"
+              /> */}
+          <section className="container">
               <span className="label">
                 <img
                   className="img-fluid"
@@ -157,17 +194,17 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
                 />{" "}
                 attached file
               </span>
-              <input
-                type="file"
-                name="upload"
-                id="upload"
-                className="upload-box"
-                placeholder="Upload File"
-                aria-label="Upload File"
-              />
-            </div>
+      <div {...getRootProps({className: 'dropzone'})}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+      </div>
+      <aside>
+        <h4>Files</h4>
+        <ul>{files}</ul>
+      </aside>
+    </section>
 
-            <BiSmile
+            <BiSmile className="cols"
               onClick={() => {
                 setShowEmoji(!showEmoji);
               }}
@@ -177,7 +214,6 @@ const MessageInput = ({ currentUser, sendMessage, userid }) => {
             )}
           </div>
         </div>
-      </div>
 
       <div className="container w-100 files">
         <ul>
