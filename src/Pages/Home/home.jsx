@@ -101,7 +101,6 @@ const Home = ({ userid }) => {
 
   useEffect(() => {    
     if (lastMessage !== null) {
-      console.log(lastMessage);
       let parsedData = JSON.parse(lastMessage.data);
       if (typeof (parsedData.type) != 'undefined' && parsedData.type == 'isonline') {
         setOnlineUsers(parsedData.activeusers);        
