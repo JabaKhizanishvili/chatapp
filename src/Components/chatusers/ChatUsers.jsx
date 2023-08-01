@@ -20,12 +20,12 @@ const Chatlist = ({ activeUser, userid, onlineusers, lastMessage }) => {
   const [dataFromChild, setDataFromChild] = useState('');
   const [users, setUsers] = useState([]);
   const user_id = C._('userid', userid)?.ID || 212;
-  // let user_id = 4774;
+  // const user_id = 4774;
 
 const fetchUsers = async () => {
   try {
-    const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}&creator_id=${user_id}`);
-    //  const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&creator_id=${user_id}`);
+    // const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}&creator_id=${user_id}`);
+     const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${pagination.start}&limit=${pagination.limit}&person_id=${user_id}`);
     if (response.ok) {
       const data = await response.json();
       const res = data;
@@ -100,7 +100,8 @@ const fetchUsers = async () => {
 
   const fetchData = async (start, limit) => {
     try {
-      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${limit}&creator_id=${user_id}`);
+      const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${limit}&creator_id=${user_id}&person_id=${user_id}`);
+      // const response = await fetch(`https://jd.self.ge/api/Chat/searchConversation?text=&start=${start}&limit=${limit}&person_id=${user_id}`);
       if (response.ok) {
         const data = await response.json();
         return data;
@@ -208,14 +209,13 @@ const fetchUsers = async () => {
 
                       {
                         users.map((user, index) => {
-                          // console.log(user.MESSAGE_COUNT * 1, 'esa');
                           return (
-                              <div
+                          <div
                           key={index}
                           style={{ cursor: 'pointer' }}
                           onClick={() => handleUserClick(user.CONVERSATION_ID)}
                           className="d-flex align-items-center mt-4 pb-2 mb-12 cursor-auto"
-                        >
+                          >
                               <div className="flex-shrink-0">
                                 {
                                   onlineUsers.includes(user.PERSON_ID.toString()) ? 
@@ -225,8 +225,8 @@ const fetchUsers = async () => {
                                 }
                             {/* <img className="img-fluid" src={user.photo} alt="user img" /> */}
                           </div>
-                          <div className="flex-grow-1 ms-3">
-                            <h6>{ user.PERSON_ID == user_id && user_id != user.CREATOR_ID ? user.CREATORNAME : user.TEXT}</h6>
+                              <div className="flex-grow-1 ms-3">
+                                <h6>{user.PERSON_ID == user_id && user_id != user.CREATOR_ID ? user.FULLNAME : user.TEXT}</h6>
                               </div>
                               {
                                 user.MESSAGE_COUNT * 1 > 0 && user.PERSON_ID == user_id &&

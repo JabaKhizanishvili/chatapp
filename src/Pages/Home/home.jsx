@@ -141,7 +141,7 @@ function download(dataurl, filename) {
           <div className="row">
             <div className="col-12">
               <div className="chat-area">
-                <Chatlist activeUser={activeUser} lastMessage={lastMessage} onlineusers={onlineusers} userid={userid} />
+                <Chatlist activeUser={activeUser} lastMessage={lastMessage} onlineusers={onlineusers} userid={user_id} />
 
                 <div className="chatbox">
                   <div className="modal-dialog-scrollable">
