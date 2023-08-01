@@ -5,6 +5,7 @@ import XApiClient from '../../ApiClient';
 import Chatlist from '../../Components/chatusers/ChatUsers';
 import MessageInput from '../../Components/messageInput/MessageInput';
 import { C, Helper } from '../../helper';
+import { AiOutlineFileAdd } from "react-icons/ai";
 import './home.css';
 
 
@@ -47,6 +48,7 @@ const Home = ({ userid }) => {
   }
 
   useEffect(() => {
+
 
     const fetchMessageHistory = async () => {
       try {
@@ -99,7 +101,8 @@ const Home = ({ userid }) => {
 
   useEffect(() => {    
     if (lastMessage !== null) {
-     let parsedData = JSON.parse(lastMessage.data);
+      console.log(lastMessage);
+      let parsedData = JSON.parse(lastMessage.data);
       if (typeof (parsedData.type) != 'undefined' && parsedData.type == 'isonline') {
         setOnlineUsers(parsedData.activeusers);        
       }
@@ -115,7 +118,7 @@ const Home = ({ userid }) => {
         }
       // }
     }
-  }, [lastMessage]);
+  }, [lastMessage, currentUser]);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -125,7 +128,13 @@ const Home = ({ userid }) => {
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
 
-
+function download(dataurl, filename) {
+  const link = document.createElement("a");
+  link.href = dataurl;
+  link.download = filename;
+  link.click();
+}
+  
   return (
     <div className="container">
       <section className="message-area">
@@ -160,23 +169,54 @@ const Home = ({ userid }) => {
                           <div>Loading...</div>
                         ) : (
                           <ul className={'msg-body-ul'}>
-                            {messageHistory.map((message, index) => {
+                              {messageHistory.map((message, index) => {
                               const jsonObject = JSON.parse(message.data);
-                              let chatType;
-
+                                let chatType;
                               if (jsonObject.SENDER_PERSON == user_id) {
                                 chatType = 'sender'
                               } else {
                                 chatType = 'repaly'
                               }
-                              return (
-                                <li key={index} className={chatType}>
-                                  <p>{Helper.isEmpty(jsonObject.message) ? jsonObject.MASSAGE : jsonObject.message}</p>
-                                  <Moment format="hh:mm:ss" className='time' withTitle>
-                                    { jsonObject.START_DATE }
-                                  </Moment>
-                                </li>
-                              );
+                                if (jsonObject.PARENT_FILE_MSG_ID == 0)
+                                // if (true)
+                                {
+                                  // console.log(jsonObject);
+                                  return (
+                                  <li className={chatType} key={index}>
+                                      <p style={{cursor:'pointer'}}>{Helper.isEmpty(jsonObject.message) ? jsonObject.MASSAGE : jsonObject.message}</p>
+                                      {/* <AiOutlineFileAdd /> */}
+                                      <div className='d-flex'>
+                                        {jsonObject.MSG_TYPE == 1 &&
+                                          <AiOutlineFileAdd size={40} className='mb-2' style={{ cursor: 'pointer' }} onClick={() => {
+                                                    download(jsonObject.FILE_PATH, jsonObject.FILE_NAME)
+                                                  }} />
+                                        }
+                                            {
+                                        messageHistory.map((e, i) => {
+                                          let innserData = JSON.parse(e.data); 
+                                          if (jsonObject.PARENT_FILE_MSG_ID == 0) {
+                                            if (jsonObject.ID == innserData.PARENT_FILE_MSG_ID) {
+                                              // console.log(e);
+                                              return (
+                                                <div key={i}>
+                                                  <AiOutlineFileAdd size={40} className='mb-2' style={{ cursor: 'pointer' }} onClick={() => {
+                                                    download(innserData.FILE_PATH, innserData.FILE_NAME)
+                                                  }} />
+                                                  {/* <h2>FILE...</h2> */}
+                                                </div>
+                                              )
+                                            }
+                                          }
+                                        })
+                                        }
+                                        </div>
+                                    <Moment format="hh:mm:ss" className='time' withTitle>
+                                      { jsonObject.START_DATE }
+                                      </Moment>
+                                  </li>
+                                );
+                                }
+                                
                             })}
                               <div className='scrollbtm'></div>
                           </ul>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import data from "@emoji-mart/data";
 import  Picker  from "@emoji-mart/react";
 import { BiSmile } from "react-icons/bi";
@@ -6,6 +6,7 @@ import { TiDelete } from "react-icons/ti";
 import XApiClient from '../../ApiClient';
 import {useDropzone} from 'react-dropzone'
 import { C } from '../../helper';
+import { async } from "react-input-emoji";
 
  export const scrollBottom = () => {
     // let msgbody = document.querySelector(".msg-body");
@@ -20,6 +21,7 @@ import { C } from '../../helper';
   }
 
 const MessageInput = ({ currentUser, sendMessage, userid }) => {
+  const [file, setFile] = useState([]);
 const {acceptedFiles, getRootProps, getInputProps, inputRef} = useDropzone();
 
   const files = acceptedFiles.map(file => (
@@ -29,7 +31,40 @@ const {acceptedFiles, getRootProps, getInputProps, inputRef} = useDropzone();
   ));
 
   
-  const SendMsgApi = new XApiClient('https://jd.self.ge');
+  // const SendMsgApi = new XApiClient('https://jd.self.ge');
+
+  const apiUrl = 'https://jd.self.ge';
+const handleFormSubmit = async (event, values) => {
+  event.preventDefault();
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+  const urlencoded = new URLSearchParams();
+  for (const i in values) {
+    urlencoded.append(i, values[i]);
+  }
+
+  const requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: urlencoded,
+    redirect: 'follow'
+  };
+
+  try {
+    const response = await fetch(`${apiUrl}/api/Chat/createMsg`, requestOptions);
+    const result = await response.text();
+    if (result != 'undefined') {
+      // setFile(result);
+      return result;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
 
   let user_id = typeof (C._('userid', userid).ID) == 'undefined' ? 212 : C._('userid', userid).ID;
   // let user_id = 4774
@@ -77,7 +112,7 @@ const {acceptedFiles, getRootProps, getInputProps, inputRef} = useDropzone();
       inputField.value.substring(endPos, inputField.value.length);
   };
 
-  const submitMsg = (e) => {
+  const submitMsg = async (e) => {
     e.preventDefault();
     if ( e.target[0].value === "" && acceptedFiles.length <= 0 ) {
       return false;
@@ -99,29 +134,59 @@ const {acceptedFiles, getRootProps, getInputProps, inputRef} = useDropzone();
     const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
     values.START_DATE = formattedDate;
 
-    SendMsgApi.handleFormSubmit(e, values);
-    
-    acceptedFiles.length = 0
-    acceptedFiles.splice(0, acceptedFiles.length)
-    inputRef.current.value = ''
+    // let resMsg = await handleFormSubmit(e, values);
 
-    const message = {
+  //  send message live on socket
+    
+    if (Files.length <= 0) {
+      let resMsg = handleFormSubmit(e, values);
+       const message = {
       msg: e.target[0].value,
       person: currentUser[0].PERSON_ID,
       START_DATE: values.START_DATE,
       SENDER_PERSON: user_id,
       CHAT_GROUP_ID: values.CHAT_GROUP_ID,
       FILES: JSON.stringify(Files),
-    };
-    sendMessage(JSON.stringify(message));
-    // sendMessage(JSON.stringify(
-    //   {
-    //     msg: e.target[0].value,
-    //     person: currentUser.ID
-    //   }));
+      PARENT_FILE_MSG_ID: acceptedFiles.length <= 0 ? 0 : 1,
+       };
+      sendMessage(JSON.stringify(message));
+      scrollBottom();
+      values.MASSAGE = '';
+
+    } else {
+      let resMsg = await handleFormSubmit(e, values);
+      resMsg = JSON.parse(resMsg);
+
+      if (resMsg != 'undefined' || resMsg != []) {
+
+        resMsg.forEach((element, index) => {
+           const message = {
+            msg: e.target[0].value,
+            person: currentUser[0].PERSON_ID,
+            START_DATE: values.START_DATE,
+            SENDER_PERSON: user_id,
+            CHAT_GROUP_ID: values.CHAT_GROUP_ID,
+            FILES: JSON.stringify(Files),
+            PARENT_FILE_MSG_ID: index <= 0 ? 0 : element.ID,
+             FILE_PATH: element.FILE_PATH,
+             FILE_NAME: element.FILE_NAME,
+             ID: element.ID,
+             MSG_TYPE: 1,
+           };
+           sendMessage(JSON.stringify(message));
+        
+        });
+
+        acceptedFiles.length = 0
+        acceptedFiles.splice(0, acceptedFiles.length)
+        inputRef.current.value = ''
+        
+      }
+  
+      // scrollBottom();
+      values.MASSAGE = '';
+    }
     
-    scrollBottom();
-    values.MASSAGE = '';
   };
 
    useEffect(() => {
